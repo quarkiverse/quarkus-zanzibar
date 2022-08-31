@@ -9,8 +9,8 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGADynamicObject;
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGAObject;
+import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
+import io.quarkiverse.zanzibar.annotations.FGAObject;
 
 public class ZanzibarAuthorizationFilter {
 

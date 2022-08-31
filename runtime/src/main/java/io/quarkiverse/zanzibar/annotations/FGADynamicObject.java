@@ -1,4 +1,4 @@
-package io.quarkiverse.zanzibar.jaxrs.annotations;
+package io.quarkiverse.zanzibar.annotations;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;

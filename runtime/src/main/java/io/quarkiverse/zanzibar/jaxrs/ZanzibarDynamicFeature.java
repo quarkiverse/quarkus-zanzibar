@@ -1,6 +1,6 @@
 package io.quarkiverse.zanzibar.jaxrs;
 
-import static io.quarkiverse.zanzibar.jaxrs.annotations.FGADynamicObject.Source.PATH;
+import static io.quarkiverse.zanzibar.annotations.FGADynamicObject.Source.*;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
@@ -22,8 +22,8 @@ import javax.ws.rs.core.FeatureContext;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
+import io.quarkiverse.zanzibar.annotations.*;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarAuthorizationFilter.Action;
-import io.quarkiverse.zanzibar.jaxrs.annotations.*;
 
 public class ZanzibarDynamicFeature implements DynamicFeature {
 

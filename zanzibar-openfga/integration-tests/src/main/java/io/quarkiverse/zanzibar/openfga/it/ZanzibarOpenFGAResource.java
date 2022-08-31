@@ -16,8 +16,8 @@
  */
 package io.quarkiverse.zanzibar.openfga.it;
 
-import static io.quarkiverse.zanzibar.jaxrs.annotations.FGADynamicObject.Source.PATH;
-import static io.quarkiverse.zanzibar.jaxrs.annotations.FGARelation.ANY;
+import static io.quarkiverse.zanzibar.annotations.FGADynamicObject.Source.PATH;
+import static io.quarkiverse.zanzibar.annotations.FGARelation.ANY;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ import javax.ws.rs.*;
 
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGADynamicObject;
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGARelation;
+import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
+import io.quarkiverse.zanzibar.annotations.FGARelation;
 import io.smallrye.mutiny.Uni;
 
 @FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
