@@ -1,4 +1,4 @@
-package io.quarkiverse.zanzibar.jaxrs.annotations;
+package io.quarkiverse.zanzibar.annotations;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 @Inherited
 @Target({ TYPE, METHOD })
 @Retention(RUNTIME)
-public @interface FGAPathObject {
+public @interface FGARequestObject {
 
-    String param();
+    String property();
 
     String type();
 

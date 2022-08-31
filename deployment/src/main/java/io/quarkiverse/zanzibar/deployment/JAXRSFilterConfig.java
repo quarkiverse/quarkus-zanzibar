@@ -3,8 +3,8 @@ package io.quarkiverse.zanzibar.deployment;
 import java.time.Duration;
 import java.util.Optional;
 
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGADynamicObject;
-import io.quarkiverse.zanzibar.jaxrs.annotations.FGARelation;
+import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
+import io.quarkiverse.zanzibar.annotations.FGARelation;
 import io.quarkus.runtime.annotations.ConfigGroup;
 import io.quarkus.runtime.annotations.ConfigItem;
 
