@@ -4,10 +4,12 @@ import static io.quarkus.deployment.annotations.ExecutionTime.STATIC_INIT;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.runtime.ZanzibarRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
+import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -37,6 +39,7 @@ class ZanzibarProcessor {
             BuildProducer<DynamicFeatureBuildItem> dynamicFeatures,
             BuildProducer<SyntheticBeanBuildItem> syntheticBeans,
             BuildProducer<AdditionalBeanBuildItem> additionalBeans,
+            BuildProducer<UnremovableBeanBuildItem> unremovableBeans,
             BuildProducer<ReflectiveClassBuildItem> reflectiveClass,
             BuildProducer<AdditionalIndexedClassesBuildItem> additionalIndexedClasses) {
 
@@ -63,6 +66,9 @@ class ZanzibarProcessor {
         } else {
             return;
         }
+
+        unremovableBeans.produce(
+                UnremovableBeanBuildItem.beanTypes(RelationshipManager.class));
 
         var dynamicFeature = recorder.createDynamicFeature(config.filter.unauthenticatedUser, config.filter.timeout,
                 config.filter.denyUnannotatedResourceMethods, filterFactory);
