@@ -143,29 +143,30 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
             if (dynamicObjectAnn.isEmpty()) {
                 var pathObjectAnn = findAnnotation(resourceInfo, FGAPathObject.class);
                 if (pathObjectAnn.isPresent()) {
-                    dynamicObjectAnn = Optional
-                            .of(new FGADynamicObject.Literal(PATH, pathObjectAnn.get().param(), pathObjectAnn.get().type()));
+                    dynamicObjectAnn = Optional.of(
+                            new FGADynamicObject.Literal(PATH, pathObjectAnn.get().param(), pathObjectAnn.get().type()));
                 }
             }
             if (dynamicObjectAnn.isEmpty()) {
                 var queryObjectAnn = findAnnotation(resourceInfo, FGAQueryObject.class);
                 if (queryObjectAnn.isPresent()) {
-                    dynamicObjectAnn = Optional
-                            .of(new FGADynamicObject.Literal(PATH, queryObjectAnn.get().param(), queryObjectAnn.get().type()));
+                    dynamicObjectAnn = Optional.of(
+                            new FGADynamicObject.Literal(QUERY, queryObjectAnn.get().param(), queryObjectAnn.get().type()));
                 }
             }
             if (dynamicObjectAnn.isEmpty()) {
                 var headerObjectAnn = findAnnotation(resourceInfo, FGAHeaderObject.class);
                 if (headerObjectAnn.isPresent()) {
-                    dynamicObjectAnn = Optional
-                            .of(new FGADynamicObject.Literal(PATH, headerObjectAnn.get().name(), headerObjectAnn.get().type()));
+                    dynamicObjectAnn = Optional.of(
+                            new FGADynamicObject.Literal(HEADER, headerObjectAnn.get().name(), headerObjectAnn.get().type()));
                 }
             }
             if (dynamicObjectAnn.isEmpty()) {
                 var requestObjectAnn = findAnnotation(resourceInfo, FGARequestObject.class);
                 if (requestObjectAnn.isPresent()) {
-                    dynamicObjectAnn = Optional.of(new FGADynamicObject.Literal(PATH, requestObjectAnn.get().property(),
-                            requestObjectAnn.get().type()));
+                    dynamicObjectAnn = Optional.of(
+                            new FGADynamicObject.Literal(REQUEST, requestObjectAnn.get().property(),
+                                    requestObjectAnn.get().type()));
                 }
             }
 
