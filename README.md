@@ -1,6 +1,7 @@
 # Quarkus Zanzibar
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.zanzibar/quarkus-zanzibar?logo=apache-maven&style=flat-square)](https://search.maven.org/artifact/io.quarkiverse.zanzibar/quarkus-zanzibar)
+[![Build](https://github.com/quarkiverse/quarkus-zanzibar/actions/workflows/build.yml/badge.svg)](https://github.com/quarkiverse/quarkus-zanzibar/actions/workflows/build.yml)
 
 ## Overview
 
