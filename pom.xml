@@ -16,6 +16,7 @@
     <module>runtime</module>
     <module>docs</module>
     <module>zanzibar-openfga</module>
+    <module>zanzibar-authzed</module>
   </modules>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
