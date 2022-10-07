@@ -62,7 +62,7 @@ The Zanzibar extension provides a number of annotations to determine the object 
 
   The object id is determined by a request property.
   
-* `FBAObjcet`
+* `FGAObjcet`
 
   The object id is provided directly as a constant.
   
