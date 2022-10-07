@@ -17,7 +17,12 @@ a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filte
 Whether the filter is enabled. 
  When enabled all endpoints must have a resolvable `FGADynamicObject` and `FGARelation` otherwise a FORBIDDEN will be returns to clients.
 
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ZANZIBAR_FILTER_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_ENABLED+++`
+endif::add-copy-button-to-env-var[]
 --|boolean 
 |`true`
 
@@ -28,7 +33,12 @@ a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filte
 --
 Should access to resource methods without FGA annotations be denied.
 
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ZANZIBAR_FILTER_DENY_UNANNOTATED_RESOURCE_METHODS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_DENY_UNANNOTATED_RESOURCE_METHODS+++`
+endif::add-copy-button-to-env-var[]
 --|boolean 
 |`true`
 
@@ -39,7 +49,12 @@ a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filte
 --
 Name used for authorization when the request is unauthenticated.
 
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ZANZIBAR_FILTER_UNAUTHENTICATED_USER+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_UNAUTHENTICATED_USER+++`
+endif::add-copy-button-to-env-var[]
 --|string 
 |
 
@@ -50,7 +65,12 @@ a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filte
 --
 Maximum time an authorization check is allowed to take.
 
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_ZANZIBAR_FILTER_TIMEOUT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_TIMEOUT+++`
+endif::add-copy-button-to-env-var[]
 --|link:https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html[Duration]
   link:#duration-note-anchor-{summaryTableId}[icon:question-circle[], title=More information about the Duration format]
 |`5S`
