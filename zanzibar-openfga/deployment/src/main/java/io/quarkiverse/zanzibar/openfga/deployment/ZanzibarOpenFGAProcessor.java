@@ -8,7 +8,7 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 class ZanzibarOpenFGAProcessor {
 
-    private static final String FEATURE = "zanzibar-open-fga";
+    private static final String FEATURE = "zanzibar-openfga";
 
     @BuildStep
     FeatureBuildItem feature() {
