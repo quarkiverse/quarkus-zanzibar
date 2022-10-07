@@ -1,9 +1,11 @@
-name: Zanzibar Openfga
-#description: Do something useful.
+name: Zanzibar OpenFGA
+description: OpenFGA Adaptor for Quarkus Zanzibar.
 metadata:
-#  keywords:
-#    - zanzibar-openfga
+  keywords:
+    - zanzibar
+    - openfga
 #  guide: https://quarkiverse.github.io/quarkiverse-docs/zanzibar-openfga/dev/
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  categories:
+  - authorization
+  - security
+  status: preview
