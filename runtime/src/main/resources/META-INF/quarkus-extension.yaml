@@ -1,9 +1,11 @@
 name: Zanzibar
-#description: Do something useful.
+description: Zanzibar style fine grained authorization support.
 metadata:
-#  keywords:
-#    - zanzibar
+  keywords:
+  - zanzibar
+  - fga
 #  guide: https://quarkiverse.github.io/quarkiverse-docs/zanzibar/dev/
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  categories:
+  - authorization
+  - security
+  status: preview
