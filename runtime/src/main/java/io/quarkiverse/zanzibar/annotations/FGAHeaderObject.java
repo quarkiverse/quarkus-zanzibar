@@ -8,13 +8,22 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Dynamically sources the Object ID for the FGA authorization check from a request header.
+ */
 @Inherited
 @Target({ TYPE, METHOD })
 @Retention(RUNTIME)
 public @interface FGAHeaderObject {
 
+    /**
+     * Name of the header to use as the Object ID.
+     */
     String name();
 
+    /**
+     * Object Type for FGA authorization check.
+     */
     String type();
 
 }
