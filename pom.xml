@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.quarkiverse.zanzibar</groupId>
   <artifactId>quarkus-zanzibar-parent</artifactId>
-  <version>999-SNAPSHOT</version>
+  <version>0.0.3</version>
   <packaging>pom</packaging>
   <name>Quarkus Zanzibar - Parent</name>
   <modules>
@@ -68,4 +68,8 @@
       </modules>
     </profile>
   </profiles>
+
+  <scm>
+    <tag>0.0.3</tag>
+  </scm>
 </project>
