@@ -10,7 +10,10 @@ The **Quarkus Zanzibar** extension provides Zanzibar style Fine Grain Authorizat
 The extension only provides the framework and relies on dedicated connectors to communicate with specific Zanzibar style
 APIs.
 
-Currently only [OpenFGA](https://openfga.dev) is supported.
+Supported APIs:
+
+- [OpenFGA](https://openfga.dev)
+- [Authzed](https://authzed.com)
 
 ## Usage
 
@@ -32,11 +35,31 @@ Add the `quarkus-zanzibar-openfga` extension to your Quarkus project in your `po
 </dependency>
 ```
 
+or 
+
+```xml
+<dependency>
+    <groupId>io.quarkiverse.zanzibar</groupId>
+    <artifactId>quarkus-zanzibar-authzed</artifactId>
+    <version>${zanzibar.version}</version>
+</dependency>
+```
+
+for authzed.
+
 #### Gradle
 
 ```kotlin
 implementation("io.quarkiverse.zanzibar:quarkus-zanzibar-openfga:${zanzibar.version}")
 ```
+
+or 
+
+```kotlin
+implementation("io.quarkiverse.zanzibar:quarkus-zanzibar-authzed:${zanzibar.version}")
+```
+
+for authzed
 
 ### Resource Method Annotations
 
