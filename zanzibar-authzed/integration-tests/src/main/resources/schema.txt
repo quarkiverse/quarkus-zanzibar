@@ -1,0 +1,9 @@
+definition user {}
+
+definition thing {
+  relation reader: user
+  relation writer: user
+  relation ower: user
+  permission read = reader + writer
+  permission write = writer
+}
