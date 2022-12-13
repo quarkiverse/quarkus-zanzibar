@@ -1,4 +1,4 @@
-package io.quarkiverse.zanzibar.openfga.test;
+package io.quarkiverse.zanzibar.authzed.test;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
