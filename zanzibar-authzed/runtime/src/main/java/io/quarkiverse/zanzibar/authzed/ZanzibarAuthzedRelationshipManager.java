@@ -34,7 +34,7 @@ public class ZanzibarAuthzedRelationshipManager implements RelationshipManager {
     }
 
     public Uni<Boolean> check(Relationship relationship) {
-        String user = relationship.getUseId();
+        String user = relationship.getUserId();
         SubjectReference subject = Tuples.parseUser(user);
         return client.v1().permissionService().checkPermission(CheckPermissionRequest.newBuilder()
                 .setConsistency(CONSISTENCY)
@@ -74,7 +74,7 @@ public class ZanzibarAuthzedRelationshipManager implements RelationshipManager {
     }
 
     static com.authzed.api.v1.Core.Relationship toAutzedRelationship(Relationship relationship) {
-        String user = relationship.getUseId();
+        String user = relationship.getUserId();
         SubjectReference subject = Tuples.parseUser(user);
         return com.authzed.api.v1.Core.Relationship.newBuilder()
                 .setRelation(relationship.getRelation())
