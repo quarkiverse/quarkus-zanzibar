@@ -1,1 +1,4 @@
 * xref:index.adoc[Quarkus Zanzibar]
+* xref:annotations.adoc[Annotations]
+* xref:openfga-connector.adoc[OpenFGA Connector]
+* xref:authzed-connector.adoc[Authzed Connector]

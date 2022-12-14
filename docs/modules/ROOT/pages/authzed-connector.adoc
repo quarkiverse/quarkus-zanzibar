@@ -1,0 +1,36 @@
+= Quarkus Zanzibar - Authzed Connector
+
+include::./includes/attributes.adoc[]
+
+== Overview
+
+The Authzed Connector provides access to https://authzed.com[Authzed] server instances or their managed
+authorization platform.
+It relies upon the https://github.com/quarkiverse/quarkus-authzed-client[Quarkus Authzed Client].
+
+Currently there is no connector specific setup or configuration beyond installing the connector dependency.
+
+Visit the https://github.com/quarkiverse/quarkus-authzed-client[Quarkus Authzed Client] project for details on configuring the client to connect to your server or the Authzed platform.
+
+[#_installation]
+== Installation
+
+To connect to Authzed servers you need to add the Zanzibar Authzed connector.
+
+For instance, with Maven, add the following dependency to your POM file:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>io.quarkiverse.zanzibar</groupId>
+    <artifactId>quarkus-zanzibar-authzed</artifactId>
+    <version>{project-version}</version>
+</dependency>
+----
+
+The connector depends on the required `quarkus-zanzibar` extension; its inclusion is optional.
+
+[[extension-configuration-reference]]
+== Extension Configuration Reference
+
+Currently there are no specific configuration options for the Authzed Connector.
