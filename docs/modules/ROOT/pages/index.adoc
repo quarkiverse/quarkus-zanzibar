@@ -22,8 +22,8 @@ Adding the `quarkus-zanzibar` extension to your project only provides access to 
 
 To communicate with your selected server API you will need to add the Zanzibar connector for your selected server.
 
-- link:openfga-connector.adoc#_installation[OpenFGA Connector Installation]
-- link:authzed-connector.adoc#_installation[Authzed Connector Installation]
+- xref:openfga-connector.adoc#_installation[OpenFGA Connector Installation]
+- xref:authzed-connector.adoc#_installation[Authzed Connector Installation]
 
 == Basic Usage
 
@@ -60,7 +60,7 @@ include::{examples-dir}/ThingResource.java[]
 === More Details
 
 Zanzibar provides a number of annotations to determine the current object id and object type. The annotations
-are detailed link:annotations.adoc[here].
+are detailed xref:annotations.adoc[here].
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
