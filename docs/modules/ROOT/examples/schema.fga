@@ -1,0 +1,9 @@
+## OpenFGA Syntax
+type thing
+    relations
+        define owner as self
+        ## permissions
+        define read as owner
+        define write as owner
+
+
