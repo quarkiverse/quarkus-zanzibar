@@ -21,9 +21,9 @@ import static io.quarkiverse.zanzibar.annotations.FGARelation.ANY;
 
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.*;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
 
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;

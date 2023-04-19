@@ -5,8 +5,8 @@ import static java.lang.String.format;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import io.quarkiverse.openfga.client.AuthorizationModelClient;
 import io.quarkiverse.openfga.client.model.TupleKey;
