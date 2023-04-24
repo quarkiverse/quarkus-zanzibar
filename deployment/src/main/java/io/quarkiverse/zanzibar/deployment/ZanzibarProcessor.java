@@ -2,7 +2,7 @@ package io.quarkiverse.zanzibar.deployment;
 
 import static io.quarkus.deployment.annotations.ExecutionTime.STATIC_INIT;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;

@@ -3,8 +3,8 @@ package io.quarkiverse.zanzibar.jaxrs;
 import java.time.Duration;
 import java.util.Optional;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 

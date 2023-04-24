@@ -8,7 +8,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.enterprise.util.AnnotationLiteral;
+import jakarta.enterprise.util.AnnotationLiteral;
 
 /**
  * Determines the dynamic source of the Object ID parameter for the FGA authorization check.
@@ -38,7 +38,7 @@ import javax.enterprise.util.AnnotationLiteral;
  * </ul>
  * <p>
  * The {@link Source#REQUEST REQUEST} source allows selecting any property set on the incoming request (i.e. from the
- * {@link javax.ws.rs.container.ContainerRequestContext#getProperty(String)}). Other filters that are run before the
+ * {@link jakarta.ws.rs.container.ContainerRequestContext#getProperty(String)}). Other filters that are run before the
  * Zanzibar authorization filter can contribute custom properties that can then be used as the source for the object
  * id.
  * <p>
