@@ -4,7 +4,7 @@ metadata:
   keywords:
   - zanzibar
   - fga
-#  guide: https://quarkiverse.github.io/quarkiverse-docs/zanzibar/dev/
+  guide: https://quarkiverse.github.io/quarkiverse-docs/quarkus-zanzibar/dev/
   categories:
   - authorization
   - security

@@ -1,9 +1,11 @@
 name: Zanzibar Authzed
-#description: Do something useful.
+description: Authzed Adaptor for Quarkus Zanzibar.
 metadata:
-#  keywords:
-#    - zanzibar-authzed
-#  guide: https://quarkiverse.github.io/quarkiverse-docs/zanzibar-authzed/dev/
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  keywords:
+    - zanzibar
+    - authzed
+  guide: https://quarkiverse.github.io/quarkiverse-docs/quarkus-zanzibar/dev/
+  categories:
+    - authorization
+    - security
+  status: preview
