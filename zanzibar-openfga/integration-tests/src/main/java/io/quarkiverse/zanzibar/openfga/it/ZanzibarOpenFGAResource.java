@@ -29,9 +29,11 @@ import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGARelation;
+import io.quarkiverse.zanzibar.annotations.FGAUserType;
 import io.smallrye.mutiny.Uni;
 
 @FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
+@FGAUserType("user")
 interface Things {
     @FGARelation(ANY)
     Uni<Void> authorize(String user, String relation, String object);
@@ -49,7 +51,7 @@ public class ZanzibarOpenFGAResource implements Things {
     @Path("authorize/{user}")
     public Uni<Void> authorize(@PathParam("user") String user, @QueryParam("relation") String relation,
             @QueryParam("object") String object) {
-        return relationshipManager.add(List.of(Relationship.of("thing", object, relation, user)));
+        return relationshipManager.add(List.of(Relationship.of("thing", object, relation, "user:" + user)));
     }
 
     @GET
