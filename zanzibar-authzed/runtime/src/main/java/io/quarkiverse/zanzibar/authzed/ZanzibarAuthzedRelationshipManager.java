@@ -16,8 +16,8 @@ import com.authzed.api.v1.PermissionService.Consistency;
 import com.authzed.api.v1.PermissionService.WriteRelationshipsRequest;
 import com.authzed.api.v1.PermissionService.WriteRelationshipsResponse;
 
-import io.quarkiverse.authzed.Tuples;
 import io.quarkiverse.authzed.client.AuthzedClient;
+import io.quarkiverse.authzed.utils.Tuples;
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.smallrye.mutiny.Uni;
