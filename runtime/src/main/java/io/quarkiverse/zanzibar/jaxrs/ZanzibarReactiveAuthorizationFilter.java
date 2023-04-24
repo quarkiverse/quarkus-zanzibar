@@ -21,8 +21,8 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
     private static final Logger log = Logger.getLogger(ZanzibarReactiveAuthorizationFilter.class);
 
     public ZanzibarReactiveAuthorizationFilter(Action annotations, RelationshipManager relationshipManager,
-            Optional<String> unauthenticatedUser, Duration timeout) {
-        super(annotations, relationshipManager, unauthenticatedUser, timeout);
+            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
+        super(annotations, relationshipManager, userType, unauthenticatedUser, timeout);
     }
 
     @Override

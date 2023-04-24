@@ -78,13 +78,15 @@ public class ZanzibarAuthorizationFilter {
 
     Action action;
     RelationshipManager relationshipManager;
+    Optional<String> userType;
     Optional<String> unauthenticatedUser;
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action, RelationshipManager relationshipManager,
-            Optional<String> unauthenticatedUser, Duration timeout) {
+            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
+        this.userType = userType;
         this.unauthenticatedUser = unauthenticatedUser;
         this.timeout = timeout;
     }
@@ -126,7 +128,7 @@ public class ZanzibarAuthorizationFilter {
 
         var principal = context.getSecurityContext().getUserPrincipal();
 
-        Optional<String> user;
+        String userId;
         if (principal == null || principal.getName() == null) {
 
             // No principal... map to unauthenticated (if available)
@@ -140,14 +142,16 @@ public class ZanzibarAuthorizationFilter {
 
                 log.debug("No use principal or name, authorizing the unauthenticated user");
 
-                user = unauthenticatedUser;
+                userId = unauthenticatedUser.get();
             }
 
         } else {
 
-            user = Optional.of(principal.getName());
+            userId = principal.getName();
         }
 
-        return Optional.of(new Check(action.objectType, objectId.get(), action.relation, user.get()));
+        String user = userType.map(type -> type + ":").orElse("") + userId;
+
+        return Optional.of(new Check(action.objectType, objectId.get(), action.relation, user));
     }
 }

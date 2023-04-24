@@ -19,9 +19,9 @@ public class ZanzibarSynchronousAuthorizationFilter extends ZanzibarAuthorizatio
 
     private static final Logger log = Logger.getLogger(ZanzibarSynchronousAuthorizationFilter.class);
 
-    public ZanzibarSynchronousAuthorizationFilter(Action action,
-            RelationshipManager relationshipManager, Optional<String> unauthenticatedUser, Duration timeout) {
-        super(action, relationshipManager, unauthenticatedUser, timeout);
+    public ZanzibarSynchronousAuthorizationFilter(Action action, RelationshipManager relationshipManager,
+            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
+        super(action, relationshipManager, userType, unauthenticatedUser, timeout);
     }
 
     @Override

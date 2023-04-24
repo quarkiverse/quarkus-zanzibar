@@ -31,7 +31,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
 
     public interface FilterFactory {
         ContainerRequestFilter create(Action annotations, RelationshipManager relationshipManager,
-                Optional<String> unauthenticatedUser, Duration timeout);
+                Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout);
     }
 
     static class AnnotationQuery {
@@ -63,12 +63,14 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
         final Optional<FGADynamicObject> dynamicObject;
         final Optional<FGAObject> constantObject;
         final Optional<FGARelation> relationAllowed;
+        final Optional<FGAUserType> userType;
 
         Annotations(Optional<FGADynamicObject> dynamicObject, Optional<FGAObject> constantObject,
-                Optional<FGARelation> relationAllowed) {
+                Optional<FGARelation> relationAllowed, Optional<FGAUserType> userType) {
             this.dynamicObject = dynamicObject;
             this.constantObject = constantObject;
             this.relationAllowed = relationAllowed;
+            this.userType = userType;
         }
 
         boolean isEmpty() {
@@ -127,8 +129,10 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
             throw new IllegalStateException(message);
         }
 
+        Optional<String> userType = annotations.userType.map(FGAUserType::value);
+
         var filter = filterCache.computeIfAbsent(action,
-                key -> filterFactory.create(key, relationshipManager, unauthenticatedUser, timeout));
+                key -> filterFactory.create(key, relationshipManager, userType, unauthenticatedUser, timeout));
 
         context.register(filter, Priorities.AUTHORIZATION);
     }
@@ -136,6 +140,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     Annotations findAuthorizationAnnotations(ResourceInfo resourceInfo) {
         return authorizationAnnotationsCache.computeIfAbsent(resourceInfo.getResourceMethod(), key -> {
 
+            var userTypeAnn = findAnnotation(resourceInfo, FGAUserType.class);
             var relationAllowedAnn = findAnnotation(resourceInfo, FGARelation.class);
             var constantObjectAnn = findAnnotation(resourceInfo, FGAObject.class);
             var dynamicObjectAnn = findAnnotation(resourceInfo, FGADynamicObject.class);
@@ -170,7 +175,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
                 }
             }
 
-            return new Annotations(dynamicObjectAnn, constantObjectAnn, relationAllowedAnn);
+            return new Annotations(dynamicObjectAnn, constantObjectAnn, relationAllowedAnn, userTypeAnn);
         });
     }
 

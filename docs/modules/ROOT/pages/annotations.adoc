@@ -63,3 +63,26 @@ The relation is specified using a single annotation providing the relation as a 
 | Annotation constant.
 
 |===
+
+=== User Type Properties
+
+The user type is specified using a single annotation providing the type name as a constant.
+
+Certain FGA implementations require the user to be provided as an object. For example instead of
+providing a user with id `some-user-id` as simply `some-user-id`, it requires the user to be in
+an object format such as `user:some-user-id` (for the user type is `user`).
+
+[cols="3"]
+|===
+| Annotation | Description | Relation Type Source
+
+| `FGAUserType`
+| Statically provides the user type name in the Zanzibar annotation.
+| Annotation constant.
+
+|===
+
+[NOTE]
+.User Object Type Requirements
+Currently only OpenFGA's 1.1 schema requires users in object format. The `@FGAUserType` will be required for
+all endpoints when using OpenFGA.
