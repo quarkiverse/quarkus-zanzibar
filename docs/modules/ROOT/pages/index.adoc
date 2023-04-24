@@ -56,6 +56,7 @@ include::{examples-dir}/ThingResource.java[]
 <5> Add the new thing's `owner` relationship to the authorization model.
 <6> Dynamically determine the id of the `Thing` to authorize from the `id` path parameter of the current HTTP request. Additionally, set the object type to `thing` as defined by the authorization model.
 <7> Check if the current user has the `owner` relation for the `thing` dynamically determined by the `@FGAPathObject`.
+<8> For implementations that require it, provide the user object type.
 
 === More Details
 
