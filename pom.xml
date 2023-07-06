@@ -18,6 +18,11 @@
     <module>zanzibar-openfga</module>
     <module>zanzibar-authzed</module>
   </modules>
+  <scm>
+    <connection>scm:git:git@github.com:quarkiverse/quarkus-zanzibar.git</connection>
+    <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-zanzibar.git</developerConnection>
+    <url>https://github.com/quarkiverse/quarkus-zanzibar</url>
+  </scm>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
