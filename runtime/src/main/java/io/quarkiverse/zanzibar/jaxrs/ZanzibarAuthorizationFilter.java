@@ -78,12 +78,12 @@ public class ZanzibarAuthorizationFilter {
 
     Action action;
     RelationshipManager relationshipManager;
-    Optional<String> userType;
+    String userType;
     Optional<String> unauthenticatedUser;
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action, RelationshipManager relationshipManager,
-            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
+            String userType, Optional<String> unauthenticatedUser, Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
         this.userType = userType;
@@ -150,7 +150,7 @@ public class ZanzibarAuthorizationFilter {
             userId = principal.getName();
         }
 
-        String user = userType.map(type -> type + ":").orElse("") + userId;
+        String user = userType + ":" + userId;
 
         return Optional.of(new Check(action.objectType, objectId.get(), action.relation, user));
     }

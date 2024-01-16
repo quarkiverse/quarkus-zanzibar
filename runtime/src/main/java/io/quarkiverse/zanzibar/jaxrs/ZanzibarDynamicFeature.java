@@ -31,7 +31,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
 
     public interface FilterFactory {
         ContainerRequestFilter create(Action annotations, RelationshipManager relationshipManager,
-                Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout);
+                String userType, Optional<String> unauthenticatedUser, Duration timeout);
     }
 
     static class AnnotationQuery {
@@ -129,7 +129,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
             throw new IllegalStateException(message);
         }
 
-        Optional<String> userType = annotations.userType.map(FGAUserType::value);
+        String userType = annotations.userType.orElseThrow(() -> new IllegalStateException("Failed to find user type")).value();
 
         var filter = filterCache.computeIfAbsent(action,
                 key -> filterFactory.create(key, relationshipManager, userType, unauthenticatedUser, timeout));

@@ -12,9 +12,11 @@ h|Default
 
 a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filter.enabled]]`link:#quarkus-zanzibar_quarkus.zanzibar.filter.enabled[quarkus.zanzibar.filter.enabled]`
 
+
 [.description]
 --
-Whether the filter is enabled. 
+Whether the filter is enabled.
+
 When enabled all endpoints must have a resolvable `FGADynamicObject` and `FGARelation` otherwise a FORBIDDEN will be returns to clients.
 
 ifdef::add-copy-button-to-env-var[]
@@ -24,10 +26,11 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_ENABLED+++`
 endif::add-copy-button-to-env-var[]
 --|boolean 
-|`true`
+|`false`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filter.deny-unannotated-resource-methods]]`link:#quarkus-zanzibar_quarkus.zanzibar.filter.deny-unannotated-resource-methods[quarkus.zanzibar.filter.deny-unannotated-resource-methods]`
+
 
 [.description]
 --
@@ -40,10 +43,11 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_DENY_UNANNOTATED_RESOURCE_METHODS+++`
 endif::add-copy-button-to-env-var[]
 --|boolean 
-|`true`
+|`false`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filter.unauthenticated-user]]`link:#quarkus-zanzibar_quarkus.zanzibar.filter.unauthenticated-user[quarkus.zanzibar.filter.unauthenticated-user]`
+
 
 [.description]
 --
@@ -61,6 +65,7 @@ endif::add-copy-button-to-env-var[]
 
 a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus.zanzibar.filter.timeout]]`link:#quarkus-zanzibar_quarkus.zanzibar.filter.timeout[quarkus.zanzibar.filter.timeout]`
 
+
 [.description]
 --
 Maximum time an authorization check is allowed to take.
@@ -73,7 +78,7 @@ Environment variable: `+++QUARKUS_ZANZIBAR_FILTER_TIMEOUT+++`
 endif::add-copy-button-to-env-var[]
 --|link:https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html[Duration]
   link:#duration-note-anchor-{summaryTableId}[icon:question-circle[], title=More information about the Duration format]
-|`5S`
+|required icon:exclamation-circle[title=Configuration property is required]
 
 |===
 ifndef::no-duration-note[]
@@ -81,11 +86,17 @@ ifndef::no-duration-note[]
 [id='duration-note-anchor-{summaryTableId}']
 .About the Duration format
 ====
-The format for durations uses the standard `java.time.Duration` format.
-You can learn more about it in the link:https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-[Duration#parse() javadoc].
+To write duration values, use the standard `java.time.Duration` format.
+See the link:https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)[Duration#parse() javadoc] for more information.
 
-You can also provide duration values starting with a number.
-In this case, if the value consists only of a number, the converter treats the value as seconds.
-Otherwise, `PT` is implicitly prepended to the value to obtain a standard `java.time.Duration` format.
+You can also use a simplified format, starting with a number:
+
+* If the value is only a number, it represents time in seconds.
+* If the value is a number followed by `ms`, it represents time in milliseconds.
+
+In other cases, the simplified format is translated to the `java.time.Duration` format for parsing:
+
+* If the value is a number followed by `h`, `m`, or `s`, it is prefixed with `PT`.
+* If the value is a number followed by `d`, it is prefixed with `P`.
 ====
 endif::no-duration-note[]

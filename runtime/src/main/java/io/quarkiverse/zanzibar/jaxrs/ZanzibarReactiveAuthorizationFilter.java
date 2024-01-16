@@ -21,7 +21,7 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
     private static final Logger log = Logger.getLogger(ZanzibarReactiveAuthorizationFilter.class);
 
     public ZanzibarReactiveAuthorizationFilter(Action annotations, RelationshipManager relationshipManager,
-            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
+            String userType, Optional<String> unauthenticatedUser, Duration timeout) {
         super(annotations, relationshipManager, userType, unauthenticatedUser, timeout);
     }
 
@@ -37,7 +37,7 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
 
         context.suspend();
 
-        var check = checkOpt.get();
+        final var check = checkOpt.get();
 
         log.debugf("Authorizing object-type=%s, object-id=%s, relation=%s, user=%s",
                 check.objectType, check.objectId, check.relation, check.user);
