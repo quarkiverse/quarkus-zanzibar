@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
+import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarReactiveAuthorizationFilter;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarSynchronousAuthorizationFilter;
@@ -26,9 +27,12 @@ public class ZanzibarRecorder {
     public Supplier<ZanzibarDynamicFeature> createDynamicFeature(Optional<String> unauthenticatedUser, Duration duration,
             boolean denyUnannotated, RuntimeValue<ZanzibarDynamicFeature.FilterFactory> filterFactory) {
         return () -> {
-            try (var relationshipManager = Arc.container().instance(RelationshipManager.class)) {
-                return new ZanzibarDynamicFeature(relationshipManager.get(), unauthenticatedUser, duration, denyUnannotated,
-                        filterFactory.getValue());
+            try (var relationshipManager = Arc.container().instance(RelationshipManager.class);
+                    var zanzibarUserIdExtractor = Arc.container().instance(ZanzibarUserIdExtractor.class)) {
+
+                return new ZanzibarDynamicFeature(relationshipManager.get(),
+                        zanzibarUserIdExtractor.get(),
+                        unauthenticatedUser, duration, denyUnannotated, filterFactory.getValue());
             }
         };
     }

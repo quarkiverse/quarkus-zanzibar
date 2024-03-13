@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
+import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGAObject;
 
@@ -78,14 +79,20 @@ public class ZanzibarAuthorizationFilter {
 
     Action action;
     RelationshipManager relationshipManager;
+    ZanzibarUserIdExtractor userIdExtractor;
     Optional<String> userType;
     Optional<String> unauthenticatedUser;
     Duration timeout;
 
-    protected ZanzibarAuthorizationFilter(Action action, RelationshipManager relationshipManager,
-            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
+    protected ZanzibarAuthorizationFilter(Action action,
+           RelationshipManager relationshipManager,
+           ZanzibarUserIdExtractor userIdExtractor,
+           Optional<String> userType,
+           Optional<String> unauthenticatedUser,
+           Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
+        this.userIdExtractor = userIdExtractor;
         this.userType = userType;
         this.unauthenticatedUser = unauthenticatedUser;
         this.timeout = timeout;
@@ -128,30 +135,23 @@ public class ZanzibarAuthorizationFilter {
 
         var principal = context.getSecurityContext().getUserPrincipal();
 
-        String userId;
-        if (principal == null || principal.getName() == null) {
+        var userIdFromPrincipal = userIdExtractor.extractUserId(principal);
 
+        Optional<String> userId;
+        if (userIdFromPrincipal.isEmpty()) {
             // No principal... map to unauthenticated (if available)
-
             if (unauthenticatedUser.isEmpty()) {
-
                 log.debug("No use principal and unauthenticated users are disallowed");
-
-                return Optional.empty();
+                userId = Optional.empty();
             } else {
-
                 log.debug("No use principal or name, authorizing the unauthenticated user");
-
-                userId = unauthenticatedUser.get();
+                userId = Optional.of(unauthenticatedUser.get());
             }
-
         } else {
-
-            userId = principal.getName();
+            userId = userIdFromPrincipal;
         }
 
-        String user = userType.map(type -> type + ":").orElse("") + userId;
-
-        return Optional.of(new Check(action.objectType, objectId.get(), action.relation, user));
+        var optionalUser = userId.map(id -> userType.map(type -> type + ":").orElse("") + id);
+        return optionalUser.map(user -> new Check(action.objectType, objectId.get(), action.relation, user));
     }
 }
