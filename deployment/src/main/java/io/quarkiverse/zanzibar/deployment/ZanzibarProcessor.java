@@ -77,11 +77,12 @@ class ZanzibarProcessor {
 
         unremovableBeans.produce(
                 UnremovableBeanBuildItem.beanTypes(RelationshipManager.class));
+        unremovableBeans.produce(
+                UnremovableBeanBuildItem.beanTypes(ZanzibarUserIdExtractor.class));
 
         additionalBeans.produce(
                 AdditionalBeanBuildItem.builder()
                         .addBeanClass(DefaultZanzibarUserIdExtractor.class)
-                        .setUnremovable()
                         .build());
 
         var dynamicFeature = recorder.createDynamicFeature(config.filter.unauthenticatedUser, config.filter.timeout,
