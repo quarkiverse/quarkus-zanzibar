@@ -85,11 +85,11 @@ public class ZanzibarAuthorizationFilter {
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action,
-           RelationshipManager relationshipManager,
-           ZanzibarUserIdExtractor userIdExtractor,
-           Optional<String> userType,
-           Optional<String> unauthenticatedUser,
-           Duration timeout) {
+            RelationshipManager relationshipManager,
+            ZanzibarUserIdExtractor userIdExtractor,
+            Optional<String> userType,
+            Optional<String> unauthenticatedUser,
+            Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
         this.userIdExtractor = userIdExtractor;
