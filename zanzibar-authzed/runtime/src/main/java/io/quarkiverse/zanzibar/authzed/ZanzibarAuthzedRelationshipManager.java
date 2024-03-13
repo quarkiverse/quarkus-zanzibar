@@ -58,7 +58,7 @@ public class ZanzibarAuthzedRelationshipManager implements RelationshipManager {
                             .build())
                     .build());
 
-        }).collect(Collectors.toList())).combinedWith(WriteRelationshipsResponse.class, r -> null);
+        }).collect(Collectors.toList())).with(WriteRelationshipsResponse.class, r -> null);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ZanzibarAuthzedRelationshipManager implements RelationshipManager {
                             .setRelationship(toAutzedRelationship(relationship))
                             .build())
                     .build());
-        }).collect(Collectors.toList())).combinedWith(WriteRelationshipsResponse.class, r -> null);
+        }).collect(Collectors.toList())).with(WriteRelationshipsResponse.class, r -> null);
     }
 
     static com.authzed.api.v1.Core.Relationship toAutzedRelationship(Relationship relationship) {
