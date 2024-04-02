@@ -23,8 +23,8 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
 
     public ZanzibarReactiveAuthorizationFilter(Action annotations, RelationshipManager relationshipManager,
             ZanzibarUserIdExtractor zanzibarUserIdExtractor, Optional<String> userType,
-            Optional<String> unauthenticatedUser, Duration timeout) {
-        super(annotations, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUser, timeout);
+            Optional<String> unauthenticatedUserId, Duration timeout) {
+        super(annotations, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUserId, timeout);
     }
 
     @Override

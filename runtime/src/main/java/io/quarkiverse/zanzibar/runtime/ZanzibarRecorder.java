@@ -24,7 +24,7 @@ public class ZanzibarRecorder {
         return new RuntimeValue<>(ZanzibarReactiveAuthorizationFilter::new);
     }
 
-    public Supplier<ZanzibarDynamicFeature> createDynamicFeature(Optional<String> unauthenticatedUser, Duration duration,
+    public Supplier<ZanzibarDynamicFeature> createDynamicFeature(Optional<String> unauthenticatedUserId, Duration duration,
             boolean denyUnannotated, RuntimeValue<ZanzibarDynamicFeature.FilterFactory> filterFactory) {
         return () -> {
             try (var relationshipManager = Arc.container().instance(RelationshipManager.class);
@@ -32,7 +32,7 @@ public class ZanzibarRecorder {
 
                 return new ZanzibarDynamicFeature(relationshipManager.get(),
                         zanzibarUserIdExtractor.get(),
-                        unauthenticatedUser, duration, denyUnannotated, filterFactory.getValue());
+                        unauthenticatedUserId, duration, denyUnannotated, filterFactory.getValue());
             }
         };
     }

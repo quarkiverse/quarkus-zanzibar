@@ -30,7 +30,7 @@ public class JAXRSFilterConfig {
     public boolean denyUnannotatedResourceMethods;
 
     /**
-     * Name used for authorization when the request is unauthenticated.
+     * User-id used for authorization when the request is unauthenticated.
      */
     @ConfigItem
     public Optional<String> unauthenticatedUser;

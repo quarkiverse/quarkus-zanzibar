@@ -22,8 +22,8 @@ public class ZanzibarSynchronousAuthorizationFilter extends ZanzibarAuthorizatio
 
     public ZanzibarSynchronousAuthorizationFilter(Action action, RelationshipManager relationshipManager,
             ZanzibarUserIdExtractor userIdExtractor,
-            Optional<String> userType, Optional<String> unauthenticatedUser, Duration timeout) {
-        super(action, relationshipManager, userIdExtractor, userType, unauthenticatedUser, timeout);
+            Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout) {
+        super(action, relationshipManager, userIdExtractor, userType, unauthenticatedUserId, timeout);
     }
 
     @Override

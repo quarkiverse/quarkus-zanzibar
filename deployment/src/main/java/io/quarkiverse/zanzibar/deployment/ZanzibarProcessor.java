@@ -9,7 +9,6 @@ import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.runtime.ZanzibarRecorder;
-import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
@@ -31,11 +30,6 @@ class ZanzibarProcessor {
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
-    }
-
-    @DefaultBean
-    ZanzibarUserIdExtractor userIdExtractor() {
-        return new DefaultZanzibarUserIdExtractor();
     }
 
     @BuildStep

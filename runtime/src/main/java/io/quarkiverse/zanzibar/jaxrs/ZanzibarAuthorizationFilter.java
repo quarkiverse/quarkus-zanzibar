@@ -27,18 +27,12 @@ public class ZanzibarAuthorizationFilter {
             CONSTANT;
 
             static ObjectSource from(FGADynamicObject.Source dynamicSource) {
-                switch (dynamicSource) {
-                    case PATH:
-                        return ObjectSource.PATH;
-                    case QUERY:
-                        return ObjectSource.QUERY;
-                    case HEADER:
-                        return ObjectSource.HEADER;
-                    case REQUEST:
-                        return ObjectSource.REQUEST;
-                    default:
-                        throw new IllegalStateException();
-                }
+                return switch (dynamicSource) {
+                    case PATH -> ObjectSource.PATH;
+                    case QUERY -> ObjectSource.QUERY;
+                    case HEADER -> ObjectSource.HEADER;
+                    case REQUEST -> ObjectSource.REQUEST;
+                };
             }
         }
 
@@ -63,7 +57,7 @@ public class ZanzibarAuthorizationFilter {
         }
     }
 
-    static class Check {
+    protected static class Check {
         final String objectType;
         final String objectId;
         final String relation;
@@ -81,20 +75,20 @@ public class ZanzibarAuthorizationFilter {
     RelationshipManager relationshipManager;
     ZanzibarUserIdExtractor userIdExtractor;
     Optional<String> userType;
-    Optional<String> unauthenticatedUser;
+    Optional<String> unauthenticatedUserId;
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action,
             RelationshipManager relationshipManager,
             ZanzibarUserIdExtractor userIdExtractor,
             Optional<String> userType,
-            Optional<String> unauthenticatedUser,
+            Optional<String> unauthenticatedUserId,
             Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
         this.userIdExtractor = userIdExtractor;
         this.userType = userType;
-        this.unauthenticatedUser = unauthenticatedUser;
+        this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
     }
 
@@ -106,25 +100,13 @@ public class ZanzibarAuthorizationFilter {
 
         UriInfo uriInfo = context.getUriInfo();
 
-        switch (action.objectIdSource) {
-            case PATH:
-                objectId = Optional.ofNullable(uriInfo.getPathParameters().getFirst(action.objectIdSourceId));
-                break;
-            case QUERY:
-                objectId = Optional.ofNullable(uriInfo.getQueryParameters().getFirst(action.objectIdSourceId));
-                break;
-            case HEADER:
-                objectId = Optional.ofNullable(context.getHeaderString(action.objectIdSourceId));
-                break;
-            case REQUEST:
-                objectId = Optional.ofNullable(context.getProperty(action.objectIdSourceId)).map(Object::toString);
-                break;
-            case CONSTANT:
-                objectId = Optional.of(action.objectIdSourceId);
-                break;
-            default:
-                throw new IllegalStateException("Unsupported ObjectId Source");
-        }
+        objectId = switch (action.objectIdSource) {
+            case PATH -> Optional.ofNullable(uriInfo.getPathParameters().getFirst(action.objectIdSourceId));
+            case QUERY -> Optional.ofNullable(uriInfo.getQueryParameters().getFirst(action.objectIdSourceId));
+            case HEADER -> Optional.ofNullable(context.getHeaderString(action.objectIdSourceId));
+            case REQUEST -> Optional.ofNullable(context.getProperty(action.objectIdSourceId)).map(Object::toString);
+            case CONSTANT -> Optional.of(action.objectIdSourceId);
+        };
 
         if (objectId.isEmpty()) {
             log.error("Failed to resolve object id");
@@ -135,23 +117,23 @@ public class ZanzibarAuthorizationFilter {
 
         var principal = context.getSecurityContext().getUserPrincipal();
 
-        var userIdFromPrincipal = userIdExtractor.extractUserId(principal);
-
-        Optional<String> userId;
-        if (userIdFromPrincipal.isEmpty()) {
-            // No principal... map to unauthenticated (if available)
-            if (unauthenticatedUser.isEmpty()) {
-                log.debug("No use principal and unauthenticated users are disallowed");
-                userId = Optional.empty();
-            } else {
-                log.debug("No use principal or name, authorizing the unauthenticated user");
-                userId = Optional.of(unauthenticatedUser.get());
-            }
-        } else {
-            userId = userIdFromPrincipal;
-        }
-
-        var optionalUser = userId.map(id -> userType.map(type -> type + ":").orElse("") + id);
-        return optionalUser.map(user -> new Check(action.objectType, objectId.get(), action.relation, user));
+        return userIdExtractor.extractUserId(principal)
+                .or(() -> {
+                    // No user-id extracted... map to unauthenticated (if available)
+                    return unauthenticatedUserId
+                            .map(userId -> {
+                                log.debug("No user-id extracted, authorizing the unauthenticated user");
+                                return userId;
+                            })
+                            .or(() -> {
+                                log.debug("No user-id extracted and unauthenticated users are disallowed");
+                                return Optional.empty();
+                            });
+                })
+                .map(userId -> {
+                    // Add user-type (if available) to the user-id
+                    var user = userType.map(type -> type + ":").orElse("") + userId;
+                    return new Check(action.objectType, objectId.get(), action.relation, user);
+                });
     }
 }
