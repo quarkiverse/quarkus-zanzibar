@@ -62,7 +62,7 @@ class ZanzibarProcessor {
             Class<?> featureClass = ZanzibarDynamicFeature.class;
             additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(featureClass));
             additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(featureClass.getName()));
-            reflectiveClass.produce(new ReflectiveClassBuildItem(true, true, featureClass));
+            reflectiveClass.produce(ReflectiveClassBuildItem.builder(featureClass).fields(true).methods(true).build());
         } else {
             return;
         }
