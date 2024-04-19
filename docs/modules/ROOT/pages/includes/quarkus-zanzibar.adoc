@@ -51,7 +51,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-zanzibar_quarkus-zanzibar-filte
 
 [.description]
 --
-Name used for authorization when the request is unauthenticated.
+User-id used for authorization when the request is unauthenticated.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_ZANZIBAR_FILTER_UNAUTHENTICATED_USER+++[]

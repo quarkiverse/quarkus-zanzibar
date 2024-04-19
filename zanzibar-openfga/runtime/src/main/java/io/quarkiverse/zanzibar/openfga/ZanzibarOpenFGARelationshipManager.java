@@ -59,6 +59,6 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
         return TupleKey.of(
                 object(relationship.getObjectType(), relationship.getObjectId()),
                 relationship.getRelation(),
-                relationship.getUserId());
+                relationship.getUser());
     }
 }

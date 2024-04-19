@@ -10,17 +10,17 @@ public class Relationship {
     private final String objectType;
     private final String objectId;
     private final String relation;
-    private final String userId;
+    private final String user;
 
-    public Relationship(String objectType, String objectId, String relation, String userId) {
+    public Relationship(String objectType, String objectId, String relation, String user) {
         this.objectType = objectType;
         this.objectId = objectId;
         this.relation = relation;
-        this.userId = userId;
+        this.user = user;
     }
 
-    public static Relationship of(String objectType, String objectId, String relation, String userId) {
-        return new Relationship(objectType, objectId, relation, userId);
+    public static Relationship of(String objectType, String objectId, String relation, String user) {
+        return new Relationship(objectType, objectId, relation, user);
     }
 
     /**
@@ -45,10 +45,10 @@ public class Relationship {
     }
 
     /**
-     * User ID that relates to Object ID.
+     * User that relates to Object ID.
      */
-    public String getUserId() {
-        return userId;
+    public String getUser() {
+        return user;
     }
 
     @Override
@@ -59,12 +59,12 @@ public class Relationship {
             return false;
         Relationship that = (Relationship) o;
         return Objects.equals(objectType, that.objectType) && Objects.equals(objectId, that.objectId)
-                && Objects.equals(relation, that.relation) && Objects.equals(userId, that.userId);
+                && Objects.equals(relation, that.relation) && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectType, objectId, relation, userId);
+        return Objects.hash(objectType, objectId, relation, user);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class Relationship {
                 "objectType='" + objectType + '\'' +
                 ", objectId='" + objectId + '\'' +
                 ", relation='" + relation + '\'' +
-                ", userId='" + userId + '\'' +
+                ", user='" + user + '\'' +
                 '}';
     }
 }

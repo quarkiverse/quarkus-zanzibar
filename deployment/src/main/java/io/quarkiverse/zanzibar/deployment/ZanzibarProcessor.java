@@ -4,7 +4,9 @@ import static io.quarkus.deployment.annotations.ExecutionTime.STATIC_INIT;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
+import io.quarkiverse.zanzibar.DefaultZanzibarUserIdExtractor;
 import io.quarkiverse.zanzibar.RelationshipManager;
+import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.runtime.ZanzibarRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
@@ -69,6 +71,13 @@ class ZanzibarProcessor {
 
         unremovableBeans.produce(
                 UnremovableBeanBuildItem.beanTypes(RelationshipManager.class));
+        unremovableBeans.produce(
+                UnremovableBeanBuildItem.beanTypes(ZanzibarUserIdExtractor.class));
+
+        additionalBeans.produce(
+                AdditionalBeanBuildItem.builder()
+                        .addBeanClass(DefaultZanzibarUserIdExtractor.class)
+                        .build());
 
         var dynamicFeature = recorder.createDynamicFeature(config.filter.unauthenticatedUser, config.filter.timeout,
                 config.filter.denyUnannotatedResourceMethods, filterFactory);
