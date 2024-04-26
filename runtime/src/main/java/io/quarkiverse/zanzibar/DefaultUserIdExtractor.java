@@ -9,7 +9,7 @@ import io.quarkus.arc.DefaultBean;
 
 @DefaultBean
 @Singleton
-public class DefaultZanzibarUserIdExtractor implements ZanzibarUserIdExtractor {
+public class DefaultUserIdExtractor implements UserIdExtractor {
 
     @Override
     public Optional<String> extractUserId(Principal principal) {

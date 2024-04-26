@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
+import io.quarkiverse.zanzibar.UserIdExtractor;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGAObject;
 
@@ -73,14 +73,14 @@ public class ZanzibarAuthorizationFilter {
 
     Action action;
     RelationshipManager relationshipManager;
-    ZanzibarUserIdExtractor userIdExtractor;
+    UserIdExtractor userIdExtractor;
     Optional<String> userType;
     Optional<String> unauthenticatedUserId;
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action,
             RelationshipManager relationshipManager,
-            ZanzibarUserIdExtractor userIdExtractor,
+            UserIdExtractor userIdExtractor,
             Optional<String> userType,
             Optional<String> unauthenticatedUserId,
             Duration timeout) {

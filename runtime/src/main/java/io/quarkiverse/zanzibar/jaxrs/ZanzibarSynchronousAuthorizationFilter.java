@@ -14,14 +14,14 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
+import io.quarkiverse.zanzibar.UserIdExtractor;
 
 public class ZanzibarSynchronousAuthorizationFilter extends ZanzibarAuthorizationFilter implements ContainerRequestFilter {
 
     private static final Logger log = Logger.getLogger(ZanzibarSynchronousAuthorizationFilter.class);
 
     public ZanzibarSynchronousAuthorizationFilter(Action action, RelationshipManager relationshipManager,
-            ZanzibarUserIdExtractor userIdExtractor,
+            UserIdExtractor userIdExtractor,
             Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout) {
         super(action, relationshipManager, userIdExtractor, userType, unauthenticatedUserId, timeout);
     }

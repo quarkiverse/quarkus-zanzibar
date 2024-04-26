@@ -3,7 +3,7 @@ package io.quarkiverse.zanzibar;
 import java.security.Principal;
 import java.util.Optional;
 
-public interface ZanzibarUserIdExtractor {
+public interface UserIdExtractor {
 
     Optional<String> extractUserId(Principal principal);
 
