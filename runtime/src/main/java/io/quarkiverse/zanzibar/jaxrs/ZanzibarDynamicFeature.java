@@ -93,8 +93,8 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     public ZanzibarDynamicFeature(RelationshipManager relationshipManager, ZanzibarUserIdExtractor userIdExtractor,
             Optional<String> unauthenticatedUserId,
             Duration timeout, boolean denyUnannotated, FilterFactory filterFactory) {
-        this.relationshipManager = relationshipManager;
-        this.userIdExtractor = userIdExtractor;
+        this.relationshipManager = Objects.requireNonNull(relationshipManager, "relationshipManager must not be null");
+        this.userIdExtractor = Objects.requireNonNull(userIdExtractor, "userIdExtractor must not be null");
         this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
         this.denyUnannotated = denyUnannotated;
