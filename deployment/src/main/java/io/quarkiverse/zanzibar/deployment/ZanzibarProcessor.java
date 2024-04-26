@@ -4,6 +4,8 @@ import static io.quarkus.deployment.annotations.ExecutionTime.STATIC_INIT;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
+import org.jboss.logging.Logger;
+
 import io.quarkiverse.zanzibar.DefaultUserIdExtractor;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.UserIdExtractor;
@@ -12,6 +14,7 @@ import io.quarkiverse.zanzibar.runtime.ZanzibarRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
+import io.quarkus.arc.deployment.ValidationPhaseBuildItem;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -26,6 +29,8 @@ import io.quarkus.runtime.RuntimeValue;
 class ZanzibarProcessor {
 
     public static final String FEATURE = "zanzibar";
+
+    private static final Logger log = Logger.getLogger(ZanzibarProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -43,7 +48,8 @@ class ZanzibarProcessor {
             BuildProducer<AdditionalBeanBuildItem> additionalBeans,
             BuildProducer<UnremovableBeanBuildItem> unremovableBeans,
             BuildProducer<ReflectiveClassBuildItem> reflectiveClass,
-            BuildProducer<AdditionalIndexedClassesBuildItem> additionalIndexedClasses) {
+            BuildProducer<AdditionalIndexedClassesBuildItem> additionalIndexedClasses,
+            BuildProducer<ValidationPhaseBuildItem.ValidationErrorBuildItem> validationErrors) {
 
         if (!config.filter.enabled) {
             return;
@@ -51,7 +57,7 @@ class ZanzibarProcessor {
 
         RuntimeValue<ZanzibarDynamicFeature.FilterFactory> filterFactory;
 
-        if (capabilities.isPresent(Capability.RESTEASY_REACTIVE)) {
+        if (capabilities.isPresent(Capability.REST) || capabilities.isPresent(Capability.RESTEASY_REACTIVE)) {
 
             filterFactory = recorder.createReactiveFilterFactory();
 
@@ -66,6 +72,7 @@ class ZanzibarProcessor {
             additionalIndexedClasses.produce(new AdditionalIndexedClassesBuildItem(featureClass.getName()));
             reflectiveClass.produce(ReflectiveClassBuildItem.builder(featureClass).fields(true).methods(true).build());
         } else {
+            log.error("Zanzibar requires either the Quarkus REST or RESTEasy extension to be included");
             return;
         }
 
