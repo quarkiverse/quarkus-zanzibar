@@ -32,8 +32,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
 
     public interface FilterFactory {
         ContainerRequestFilter create(Action annotations, RelationshipManager relationshipManager,
-                ZanzibarUserIdExtractor zanzibarUserIdExtractor,
-                Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout);
+                ZanzibarUserIdExtractor userIdExtractor, Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout);
     }
 
     static class AnnotationQuery {
@@ -81,7 +80,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     }
 
     RelationshipManager relationshipManager;
-    ZanzibarUserIdExtractor zanzibarUserIdExtractor;
+    ZanzibarUserIdExtractor userIdExtractor;
     Optional<String> unauthenticatedUserId;
     Duration timeout;
     boolean denyUnannotated;
@@ -91,11 +90,11 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     Map<Method, Annotations> authorizationAnnotationsCache = new ConcurrentHashMap<>();
     Map<AnnotationQuery, Optional<Annotation>> annotationQueryCache = new ConcurrentHashMap<>();
 
-    public ZanzibarDynamicFeature(RelationshipManager relationshipManager, ZanzibarUserIdExtractor zanzibarUserIdExtractor,
+    public ZanzibarDynamicFeature(RelationshipManager relationshipManager, ZanzibarUserIdExtractor userIdExtractor,
             Optional<String> unauthenticatedUserId,
             Duration timeout, boolean denyUnannotated, FilterFactory filterFactory) {
         this.relationshipManager = relationshipManager;
-        this.zanzibarUserIdExtractor = zanzibarUserIdExtractor;
+        this.userIdExtractor = userIdExtractor;
         this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
         this.denyUnannotated = denyUnannotated;
@@ -137,7 +136,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
         Optional<String> userType = annotations.userType.map(FGAUserType::value);
 
         var filter = filterCache.computeIfAbsent(action,
-                key -> filterFactory.create(key, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUserId,
+                key -> filterFactory.create(key, relationshipManager, userIdExtractor, userType, unauthenticatedUserId,
                         timeout));
 
         context.register(filter, Priorities.AUTHORIZATION);

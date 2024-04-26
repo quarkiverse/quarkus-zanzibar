@@ -22,9 +22,9 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
     private static final Logger log = Logger.getLogger(ZanzibarReactiveAuthorizationFilter.class);
 
     public ZanzibarReactiveAuthorizationFilter(Action annotations, RelationshipManager relationshipManager,
-            ZanzibarUserIdExtractor zanzibarUserIdExtractor, Optional<String> userType,
+            ZanzibarUserIdExtractor userIdExtractor, Optional<String> userType,
             Optional<String> unauthenticatedUserId, Duration timeout) {
-        super(annotations, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUserId, timeout);
+        super(annotations, relationshipManager, userIdExtractor, userType, unauthenticatedUserId, timeout);
     }
 
     @Override
