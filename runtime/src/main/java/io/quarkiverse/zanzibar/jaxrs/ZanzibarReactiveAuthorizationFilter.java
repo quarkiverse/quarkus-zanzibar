@@ -14,7 +14,7 @@ import org.jboss.resteasy.reactive.server.spi.ResteasyReactiveContainerRequestFi
 
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
+import io.quarkiverse.zanzibar.UserIdExtractor;
 
 public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFilter
         implements ResteasyReactiveContainerRequestFilter {
@@ -22,9 +22,9 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
     private static final Logger log = Logger.getLogger(ZanzibarReactiveAuthorizationFilter.class);
 
     public ZanzibarReactiveAuthorizationFilter(Action annotations, RelationshipManager relationshipManager,
-            ZanzibarUserIdExtractor zanzibarUserIdExtractor, Optional<String> userType,
+            UserIdExtractor userIdExtractor, Optional<String> userType,
             Optional<String> unauthenticatedUserId, Duration timeout) {
-        super(annotations, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUserId, timeout);
+        super(annotations, relationshipManager, userIdExtractor, userType, unauthenticatedUserId, timeout);
     }
 
     @Override

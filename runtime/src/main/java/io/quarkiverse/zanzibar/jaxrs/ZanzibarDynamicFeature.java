@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.FeatureContext;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.ZanzibarUserIdExtractor;
+import io.quarkiverse.zanzibar.UserIdExtractor;
 import io.quarkiverse.zanzibar.annotations.*;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarAuthorizationFilter.Action;
 
@@ -32,8 +32,8 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
 
     public interface FilterFactory {
         ContainerRequestFilter create(Action annotations, RelationshipManager relationshipManager,
-                ZanzibarUserIdExtractor zanzibarUserIdExtractor,
-                Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout);
+                UserIdExtractor userIdExtractor, Optional<String> userType, Optional<String> unauthenticatedUserId,
+                Duration timeout);
     }
 
     static class AnnotationQuery {
@@ -81,7 +81,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     }
 
     RelationshipManager relationshipManager;
-    ZanzibarUserIdExtractor zanzibarUserIdExtractor;
+    UserIdExtractor userIdExtractor;
     Optional<String> unauthenticatedUserId;
     Duration timeout;
     boolean denyUnannotated;
@@ -91,11 +91,11 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     Map<Method, Annotations> authorizationAnnotationsCache = new ConcurrentHashMap<>();
     Map<AnnotationQuery, Optional<Annotation>> annotationQueryCache = new ConcurrentHashMap<>();
 
-    public ZanzibarDynamicFeature(RelationshipManager relationshipManager, ZanzibarUserIdExtractor zanzibarUserIdExtractor,
+    public ZanzibarDynamicFeature(RelationshipManager relationshipManager, UserIdExtractor userIdExtractor,
             Optional<String> unauthenticatedUserId,
             Duration timeout, boolean denyUnannotated, FilterFactory filterFactory) {
-        this.relationshipManager = relationshipManager;
-        this.zanzibarUserIdExtractor = zanzibarUserIdExtractor;
+        this.relationshipManager = Objects.requireNonNull(relationshipManager, "relationshipManager must not be null");
+        this.userIdExtractor = Objects.requireNonNull(userIdExtractor, "userIdExtractor must not be null");
         this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
         this.denyUnannotated = denyUnannotated;
@@ -137,7 +137,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
         Optional<String> userType = annotations.userType.map(FGAUserType::value);
 
         var filter = filterCache.computeIfAbsent(action,
-                key -> filterFactory.create(key, relationshipManager, zanzibarUserIdExtractor, userType, unauthenticatedUserId,
+                key -> filterFactory.create(key, relationshipManager, userIdExtractor, userType, unauthenticatedUserId,
                         timeout));
 
         context.register(filter, Priorities.AUTHORIZATION);
