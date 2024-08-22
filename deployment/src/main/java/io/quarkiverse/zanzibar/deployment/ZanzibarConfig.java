@@ -2,16 +2,18 @@ package io.quarkiverse.zanzibar.deployment;
 
 import static io.quarkiverse.zanzibar.deployment.ZanzibarProcessor.FEATURE;
 
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
 
-@ConfigRoot(name = FEATURE)
-public class ZanzibarConfig {
+@ConfigRoot
+@ConfigMapping(prefix = ZanzibarConfig.PREFIX)
+public interface ZanzibarConfig {
+
+    String PREFIX = "quarkus." + FEATURE + ".";
 
     /**
      * Configuration for JAX-RS authorization filter.
      */
-    @ConfigItem
-    public JAXRSFilterConfig filter;
+    JAXRSFilterConfig filter();
 
 }

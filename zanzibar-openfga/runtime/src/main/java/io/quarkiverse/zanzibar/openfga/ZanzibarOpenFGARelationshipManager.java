@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import io.quarkiverse.openfga.client.AuthorizationModelClient;
+import io.quarkiverse.openfga.client.model.ConditionalTupleKey;
 import io.quarkiverse.openfga.client.model.TupleKey;
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
@@ -33,7 +34,7 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
     public Uni<Void> add(List<Relationship> relationships) {
 
         var tuples = relationships.stream()
-                .map(this::tupleKeyFromRelationship)
+                .map(this::conditionalTupleKeyFromRelationship)
                 .collect(Collectors.toList());
 
         return authorizationModelClient.write(tuples, null)
@@ -57,6 +58,13 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
 
     TupleKey tupleKeyFromRelationship(Relationship relationship) {
         return TupleKey.of(
+                object(relationship.getObjectType(), relationship.getObjectId()),
+                relationship.getRelation(),
+                relationship.getUser());
+    }
+
+    ConditionalTupleKey conditionalTupleKeyFromRelationship(Relationship relationship) {
+        return ConditionalTupleKey.of(
                 object(relationship.getObjectType(), relationship.getObjectId()),
                 relationship.getRelation(),
                 relationship.getUser());

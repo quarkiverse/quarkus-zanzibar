@@ -5,14 +5,12 @@ import java.util.Optional;
 
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGARelation;
-import io.quarkus.runtime.annotations.ConfigGroup;
-import io.quarkus.runtime.annotations.ConfigItem;
+import io.smallrye.config.WithDefault;
 
 /**
  * Configuration for JAX-RS authorization filter.
  */
-@ConfigGroup
-public class JAXRSFilterConfig {
+public interface JAXRSFilterConfig {
 
     /**
      * Whether the filter is enabled.
@@ -20,25 +18,24 @@ public class JAXRSFilterConfig {
      * When enabled all endpoints must have a resolvable {@link FGADynamicObject} and
      * {@link FGARelation} otherwise a FORBIDDEN will be returns to clients.
      */
-    @ConfigItem(defaultValue = "true")
-    public boolean enabled;
+    @WithDefault("true")
+    boolean enabled();
 
     /**
      * Should access to resource methods without FGA annotations be denied.
      */
-    @ConfigItem(defaultValue = "true")
-    public boolean denyUnannotatedResourceMethods;
+    @WithDefault("true")
+    boolean denyUnannotatedResourceMethods();
 
     /**
      * User-id used for authorization when the request is unauthenticated.
      */
-    @ConfigItem
-    public Optional<String> unauthenticatedUser;
+    Optional<String> unauthenticatedUser();
 
     /**
      * Maximum time an authorization check is allowed to take.
      */
-    @ConfigItem(defaultValue = "5s")
-    public Duration timeout;
+    @WithDefault("5s")
+    Duration timeout();
 
 }
