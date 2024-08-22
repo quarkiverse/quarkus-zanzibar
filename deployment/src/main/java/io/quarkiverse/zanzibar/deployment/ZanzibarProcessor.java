@@ -51,7 +51,7 @@ class ZanzibarProcessor {
             BuildProducer<AdditionalIndexedClassesBuildItem> additionalIndexedClasses,
             BuildProducer<ValidationPhaseBuildItem.ValidationErrorBuildItem> validationErrors) {
 
-        if (!config.filter.enabled) {
+        if (!config.filter().enabled()) {
             return;
         }
 
@@ -86,8 +86,9 @@ class ZanzibarProcessor {
                         .addBeanClass(DefaultUserIdExtractor.class)
                         .build());
 
-        var dynamicFeature = recorder.createDynamicFeature(config.filter.unauthenticatedUser, config.filter.timeout,
-                config.filter.denyUnannotatedResourceMethods, filterFactory);
+        var dynamicFeature = recorder
+                .createDynamicFeature(config.filter().unauthenticatedUser(), config.filter().timeout(),
+                        config.filter().denyUnannotatedResourceMethods(), filterFactory);
 
         syntheticBeans.produce(
                 SyntheticBeanBuildItem.configure(ZanzibarDynamicFeature.class)
