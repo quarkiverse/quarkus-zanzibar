@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse.zanzibar</groupId>
     <artifactId>quarkus-zanzibar-authzed-parent</artifactId>
-    <version>1.7.0</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>quarkus-zanzibar-authzed</artifactId>
   <name>Quarkus Zanzibar - Authzed - Runtime</name>
