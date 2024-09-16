@@ -9,7 +9,7 @@ import io.smallrye.config.ConfigMapping;
 @ConfigMapping(prefix = ZanzibarConfig.PREFIX)
 public interface ZanzibarConfig {
 
-    String PREFIX = "quarkus." + FEATURE + ".";
+    String PREFIX = "quarkus." + FEATURE;
 
     /**
      * Configuration for JAX-RS authorization filter.
