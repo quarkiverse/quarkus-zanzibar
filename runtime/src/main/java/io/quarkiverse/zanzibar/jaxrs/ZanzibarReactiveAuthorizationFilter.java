@@ -1,12 +1,10 @@
 package io.quarkiverse.zanzibar.jaxrs;
 
-import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
-import static jakarta.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-
 import java.time.Duration;
 import java.util.Optional;
 
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.InternalServerErrorException;
 
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.server.spi.ResteasyReactiveContainerRequestContext;
@@ -33,7 +31,7 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
         var checkOpt = prepare(context);
 
         if (checkOpt.isEmpty()) {
-            context.abortWith(Response.status(FORBIDDEN).build());
+            context.resume(new ForbiddenException());
             return;
         }
 
@@ -54,17 +52,16 @@ public class ZanzibarReactiveAuthorizationFilter extends ZanzibarAuthorizationFi
 
                     if (!allowed) {
 
-                        context.abortWith(Response.status(FORBIDDEN).build());
-                    }
+                        context.resume(new ForbiddenException());
+                    } else {
 
-                    context.resume();
+                        context.resume();
+                    }
 
                 }, (x) -> {
                     log.error("Authorization check failed", x);
 
-                    context.abortWith(Response.status(INTERNAL_SERVER_ERROR).build());
-
-                    context.resume();
+                    context.resume(new InternalServerErrorException(x));
                 });
     }
 }
