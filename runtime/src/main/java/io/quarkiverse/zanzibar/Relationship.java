@@ -4,76 +4,25 @@ import java.util.Objects;
 
 /**
  * Models a single relationship managed by FGA backend.
+ *
+ * @param objectType Type of object.
+ * @param objectId ID of object.
+ * @param relation Relation of Object to User.
+ * @param userType Type of user.
+ * @param userId ID of user.
  */
-public class Relationship {
+public record Relationship(String objectType, String objectId, String relation, String userType, String userId) {
 
-    private final String objectType;
-    private final String objectId;
-    private final String relation;
-    private final String user;
-
-    public Relationship(String objectType, String objectId, String relation, String user) {
-        this.objectType = objectType;
-        this.objectId = objectId;
-        this.relation = relation;
-        this.user = user;
+    public Relationship {
+        Objects.requireNonNull(objectType, "objectType cannot be null");
+        Objects.requireNonNull(objectId, "objectId cannot be null");
+        Objects.requireNonNull(relation, "relation cannot be null");
+        Objects.requireNonNull(userType, "userType cannot be null");
+        Objects.requireNonNull(userId, "userId cannot be null");
     }
 
-    public static Relationship of(String objectType, String objectId, String relation, String user) {
-        return new Relationship(objectType, objectId, relation, user);
+    public static Relationship of(String objectType, String objectId, String relation, String userType, String userId) {
+        return new Relationship(objectType, objectId, relation, userType, userId);
     }
 
-    /**
-     * Type of object.
-     */
-    public String getObjectType() {
-        return objectType;
-    }
-
-    /**
-     * ID of object.
-     */
-    public String getObjectId() {
-        return objectId;
-    }
-
-    /**
-     * Relation of Object ID to User ID.
-     */
-    public String getRelation() {
-        return relation;
-    }
-
-    /**
-     * User that relates to Object ID.
-     */
-    public String getUser() {
-        return user;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Relationship))
-            return false;
-        Relationship that = (Relationship) o;
-        return Objects.equals(objectType, that.objectType) && Objects.equals(objectId, that.objectId)
-                && Objects.equals(relation, that.relation) && Objects.equals(user, that.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(objectType, objectId, relation, user);
-    }
-
-    @Override
-    public String toString() {
-        return "Relationship{" +
-                "objectType='" + objectType + '\'' +
-                ", objectId='" + objectId + '\'' +
-                ", relation='" + relation + '\'' +
-                ", user='" + user + '\'' +
-                '}';
-    }
 }

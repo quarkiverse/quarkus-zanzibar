@@ -26,6 +26,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 
 import io.quarkiverse.zanzibar.Relationship;
+import io.quarkiverse.zanzibar.RelationshipContext;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGARelation;
@@ -33,10 +34,17 @@ import io.quarkiverse.zanzibar.annotations.FGAUserType;
 import io.smallrye.mutiny.Uni;
 
 @FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
-@FGAUserType("user")
 interface Things {
     @FGARelation(ANY)
-    Uni<Void> authorize(String user, String relation, String object);
+    @POST
+    @Path("ann/authorize")
+    @FGAUserType("user")
+    Uni<Void> annotationAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
+
+    @FGARelation(ANY)
+    @POST
+    @Path("jwt/authorize")
+    Uni<Void> jwtAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
 }
 
 @Path("/openfga")
@@ -46,17 +54,40 @@ public class ZanzibarOpenFGAResource implements Things {
 
     @Inject
     RelationshipManager relationshipManager;
+    @Inject
+    RelationshipContext relationshipContext;
 
-    @POST
-    @Path("authorize/{user}")
-    public Uni<Void> authorize(@PathParam("user") String user, @QueryParam("relation") String relation,
-            @QueryParam("object") String object) {
-        return relationshipManager.add(List.of(Relationship.of("thing", object, relation, "user:" + user)));
+    @Override
+    public Uni<Void> annotationAuthorize(String relation, String objectId) {
+        return authorize(relation, objectId);
+    }
+
+    @Override
+    public Uni<Void> jwtAuthorize(String relation, String objectId) {
+        return authorize(relation, objectId);
+    }
+
+    public Uni<Void> authorize(String relation, String objectId) {
+        String objectType = relationshipContext.objectType()
+                .orElseThrow(() -> new IllegalStateException("Object type not available in context"));
+        String userType = relationshipContext.userType()
+                .orElseThrow(() -> new IllegalStateException("User type not available in context"));
+        String userId = relationshipContext.userId()
+                .orElseThrow(() -> new IllegalStateException("User ID not available in context"));
+        var relationship = Relationship.of(objectType, objectId, relation, userType, userId);
+        return relationshipManager.add(List.of(relationship));
     }
 
     @GET
-    @Path("things/{id}")
-    public String getThing(@PathParam("id") String id) {
+    @Path("ann/things/{id}")
+    @FGAUserType("user")
+    public String annotationGetThing(@PathParam("id") String id) {
+        return "Thing " + id;
+    }
+
+    @GET
+    @Path("jwt/things/{id}")
+    public String jwtGetThing(@PathParam("id") String id) {
         return "Thing " + id;
     }
 }

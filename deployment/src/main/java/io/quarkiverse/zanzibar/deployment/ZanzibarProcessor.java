@@ -6,9 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.zanzibar.DefaultUserIdExtractor;
-import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.UserIdExtractor;
+import io.quarkiverse.zanzibar.*;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.runtime.ZanzibarRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
@@ -79,16 +77,31 @@ class ZanzibarProcessor {
         unremovableBeans.produce(
                 UnremovableBeanBuildItem.beanTypes(RelationshipManager.class));
         unremovableBeans.produce(
-                UnremovableBeanBuildItem.beanTypes(UserIdExtractor.class));
+                UnremovableBeanBuildItem.beanTypes(RelationshipContextManager.class));
+        unremovableBeans.produce(
+                UnremovableBeanBuildItem.beanTypes(RelationshipContext.class));
+        unremovableBeans.produce(
+                UnremovableBeanBuildItem.beanTypes(UserExtractor.class));
 
         additionalBeans.produce(
                 AdditionalBeanBuildItem.builder()
-                        .addBeanClass(DefaultUserIdExtractor.class)
+                        .addBeanClass(RelationshipContextManager.class)
+                        .addBeanClass(RelationshipContext.class)
                         .build());
+
+        var defaultUserExtractor = recorder.createUserExtractor(config.extractUserTypeFromName(),
+                config.userTypeSeparator(), config.extractUserTypeFromRoles());
+
+        syntheticBeans.produce(
+                SyntheticBeanBuildItem.configure(DefaultUserExtractor.class)
+                        .defaultBean()
+                        .scope(ApplicationScoped.class)
+                        .supplier(defaultUserExtractor)
+                        .done());
 
         var dynamicFeature = recorder
                 .createDynamicFeature(config.filter().unauthenticatedUser(), config.filter().timeout(),
-                        config.filter().denyUnannotatedResourceMethods(), filterFactory);
+                        config.filter().denyUnannotatedResourceMethods(), filterFactory, defaultUserExtractor);
 
         syntheticBeans.produce(
                 SyntheticBeanBuildItem.configure(ZanzibarDynamicFeature.class)

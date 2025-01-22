@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import io.quarkiverse.zanzibar.DefaultUserExtractor;
+import io.quarkiverse.zanzibar.RelationshipContextManager;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.UserIdExtractor;
+import io.quarkiverse.zanzibar.UserExtractor;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarDynamicFeature;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarReactiveAuthorizationFilter;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarSynchronousAuthorizationFilter;
@@ -25,15 +27,24 @@ public class ZanzibarRecorder {
     }
 
     public Supplier<ZanzibarDynamicFeature> createDynamicFeature(Optional<String> unauthenticatedUserId, Duration duration,
-            boolean denyUnannotated, RuntimeValue<ZanzibarDynamicFeature.FilterFactory> filterFactory) {
+            boolean denyUnannotated, RuntimeValue<ZanzibarDynamicFeature.FilterFactory> filterFactory,
+            Supplier<DefaultUserExtractor> defaultUserExtractor) {
         return () -> {
             try (var relationshipManager = Arc.container().instance(RelationshipManager.class);
-                    var zanzibarUserIdExtractor = Arc.container().instance(UserIdExtractor.class)) {
+                    var relationshipContextManager = Arc.container().instance(RelationshipContextManager.class);
+                    var userExtractor = Arc.container().instance(UserExtractor.class)) {
 
-                return new ZanzibarDynamicFeature(relationshipManager.get(),
-                        zanzibarUserIdExtractor.get(),
-                        unauthenticatedUserId, duration, denyUnannotated, filterFactory.getValue());
+                var selectedUserExtractor = userExtractor.isAvailable() ? userExtractor.get() : defaultUserExtractor.get();
+
+                return new ZanzibarDynamicFeature(relationshipManager.get(), relationshipContextManager.get(),
+                        selectedUserExtractor, unauthenticatedUserId, duration, denyUnannotated,
+                        filterFactory.getValue());
             }
         };
+    }
+
+    public Supplier<DefaultUserExtractor> createUserExtractor(boolean extractUserTypeFromName, String userTypeSeparator,
+            boolean extractUserTypeFromRoles) {
+        return () -> new DefaultUserExtractor(extractUserTypeFromName, userTypeSeparator, extractUserTypeFromRoles);
     }
 }

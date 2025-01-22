@@ -8,10 +8,14 @@ import jakarta.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.zanzibar.Relationship;
+import io.quarkiverse.zanzibar.RelationshipContextManager;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.UserIdExtractor;
+import io.quarkiverse.zanzibar.UserExtractor;
+import io.quarkiverse.zanzibar.UserExtractor.User;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGAObject;
+import io.quarkiverse.zanzibar.annotations.FGARelation;
 
 public class ZanzibarAuthorizationFilter {
 
@@ -57,42 +61,42 @@ public class ZanzibarAuthorizationFilter {
         }
     }
 
-    protected static class Check {
-        final String objectType;
-        final String objectId;
-        final String relation;
-        final String user;
+    protected sealed interface PrepareResult {
+        record Check(Relationship relationship) implements PrepareResult {
+        }
 
-        Check(String objectType, String objectId, String relation, String user) {
-            this.objectType = objectType;
-            this.objectId = objectId;
-            this.relation = relation;
-            this.user = user;
+        record Pass() implements PrepareResult {
+        }
+
+        record Deny() implements PrepareResult {
         }
     }
 
     Action action;
     RelationshipManager relationshipManager;
-    UserIdExtractor userIdExtractor;
+    RelationshipContextManager relationshipContextManager;
+    UserExtractor userExtractor;
     Optional<String> userType;
     Optional<String> unauthenticatedUserId;
     Duration timeout;
 
     protected ZanzibarAuthorizationFilter(Action action,
             RelationshipManager relationshipManager,
-            UserIdExtractor userIdExtractor,
+            RelationshipContextManager relationshipContextManager,
+            UserExtractor userExtractor,
             Optional<String> userType,
             Optional<String> unauthenticatedUserId,
             Duration timeout) {
         this.action = action;
         this.relationshipManager = relationshipManager;
-        this.userIdExtractor = userIdExtractor;
+        this.relationshipContextManager = relationshipContextManager;
+        this.userExtractor = userExtractor;
         this.userType = userType;
         this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
     }
 
-    protected Optional<Check> prepare(ContainerRequestContext context) {
+    protected PrepareResult prepare(ContainerRequestContext context) {
 
         // Determine object id
 
@@ -108,32 +112,38 @@ public class ZanzibarAuthorizationFilter {
             case CONSTANT -> Optional.of(action.objectIdSourceId);
         };
 
-        if (objectId.isEmpty()) {
-            log.error("Failed to resolve object id");
-            return Optional.empty();
-        }
-
         // Determine user
-
-        var principal = context.getSecurityContext().getUserPrincipal();
-
-        return userIdExtractor.extractUserId(principal)
+        var extractedUser = userExtractor.extractUser(context.getSecurityContext().getUserPrincipal(), userType.orElse(null))
                 .or(() -> {
                     // No user-id extracted... map to unauthenticated (if available)
                     return unauthenticatedUserId
                             .map(userId -> {
                                 log.debug("No user-id extracted, authorizing the unauthenticated user");
-                                return userId;
+                                return new User(userType.orElse(""), userId);
                             })
                             .or(() -> {
-                                log.debug("No user-id extracted and unauthenticated users are disallowed");
+                                log.debug("No user-id extracted and no unauthenticated user-id provided");
                                 return Optional.empty();
                             });
-                })
-                .map(userId -> {
-                    // Add user-type (if available) to the user-id
-                    var user = userType.map(type -> type + ":").orElse("") + userId;
-                    return new Check(action.objectType, objectId.get(), action.relation, user);
                 });
+
+        if (action.relation.equals(FGARelation.ANY)) {
+            log.debug("Any relation specified, allowing access");
+            relationshipContextManager.initialize(Optional.of(action.objectType), objectId,
+                    Optional.of(action.relation), extractedUser.map(User::type).or(() -> userType),
+                    extractedUser.map(User::id));
+            return new PrepareResult.Pass();
+        }
+
+        if (extractedUser.isEmpty() || objectId.isEmpty()) {
+            log.debugf("%s not available, denying access", extractedUser.isEmpty() ? "User" : "Object id");
+            return new PrepareResult.Deny();
+        }
+
+        var user = extractedUser.get();
+        var relationship = new Relationship(action.objectType, objectId.get(), action.relation, user.type(), user.id());
+        relationshipContextManager.initialize(relationship);
+
+        return new PrepareResult.Check(relationship);
     }
 }
