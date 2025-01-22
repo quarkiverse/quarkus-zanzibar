@@ -1,7 +1,5 @@
 package io.quarkiverse.zanzibar.openfga;
 
-import static java.lang.String.format;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,8 +7,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import io.quarkiverse.openfga.client.AuthorizationModelClient;
-import io.quarkiverse.openfga.client.model.ConditionalTupleKey;
-import io.quarkiverse.openfga.client.model.TupleKey;
+import io.quarkiverse.openfga.client.model.RelObject;
+import io.quarkiverse.openfga.client.model.RelTupleDefinition;
+import io.quarkiverse.openfga.client.model.RelTupleKey;
+import io.quarkiverse.openfga.client.model.RelUser;
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.smallrye.mutiny.Uni;
@@ -27,14 +27,16 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
 
     public Uni<Boolean> check(Relationship relationship) {
 
-        return authorizationModelClient.check(tupleKeyFromRelationship(relationship), null);
+        var relTupleKey = tupleKeyFromRelationship(relationship);
+
+        return authorizationModelClient.check(relTupleKey);
     }
 
     @Override
     public Uni<Void> add(List<Relationship> relationships) {
 
         var tuples = relationships.stream()
-                .map(this::conditionalTupleKeyFromRelationship)
+                .map(this::tupleDefinitionFromRelationship)
                 .toList();
 
         return authorizationModelClient.write(tuples, null)
@@ -52,21 +54,19 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
                 .replaceWithVoid();
     }
 
-    String object(String objectType, String objectId) {
-        return format("%s:%s", objectType, objectId);
+    RelTupleKey tupleKeyFromRelationship(Relationship relationship) {
+        return RelTupleKey.builder()
+                .object(RelObject.of(relationship.objectType(), relationship.objectId()))
+                .relation(relationship.relation())
+                .user(RelUser.of(relationship.userType(), relationship.userId()))
+                .build();
     }
 
-    TupleKey tupleKeyFromRelationship(Relationship relationship) {
-        return TupleKey.of(
-                object(relationship.objectType(), relationship.objectId()),
-                relationship.relation(),
-                object(relationship.userType(), relationship.userId()));
-    }
-
-    ConditionalTupleKey conditionalTupleKeyFromRelationship(Relationship relationship) {
-        return ConditionalTupleKey.of(
-                object(relationship.objectType(), relationship.objectId()),
-                relationship.relation(),
-                object(relationship.userType(), relationship.userId()));
+    RelTupleDefinition tupleDefinitionFromRelationship(Relationship relationship) {
+        return RelTupleDefinition.builder()
+                .object(RelObject.of(relationship.objectType(), relationship.objectId()))
+                .relation(relationship.relation())
+                .user(RelUser.of(relationship.userType(), relationship.userId()))
+                .build();
     }
 }

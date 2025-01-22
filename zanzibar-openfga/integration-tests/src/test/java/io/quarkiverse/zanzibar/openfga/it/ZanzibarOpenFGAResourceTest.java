@@ -3,11 +3,8 @@ package io.quarkiverse.zanzibar.openfga.it;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
-import jakarta.inject.Inject;
-
 import org.junit.jupiter.api.Test;
 
-import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.jwt.build.Jwt;
 
