@@ -20,17 +20,25 @@ import static io.quarkiverse.zanzibar.annotations.FGADynamicObject.Source.PATH;
 import static io.quarkiverse.zanzibar.annotations.FGARelation.ANY;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 
+import org.jboss.logging.Logger;
+
+import io.quarkiverse.openfga.client.AuthorizationModelClient;
+import io.quarkiverse.openfga.client.model.RelTupleKey;
 import io.quarkiverse.zanzibar.Relationship;
 import io.quarkiverse.zanzibar.RelationshipContext;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGARelation;
 import io.quarkiverse.zanzibar.annotations.FGAUserType;
+import io.quarkiverse.zanzibar.openfga.OpenFGAContextSupplier;
 import io.smallrye.mutiny.Uni;
 
 @FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
@@ -89,5 +97,18 @@ public class ZanzibarOpenFGAResource implements Things {
     @Path("jwt/things/{id}")
     public String jwtGetThing(@PathParam("id") String id) {
         return "Thing " + id;
+    }
+}
+
+@ApplicationScoped
+class ContextSupplier implements OpenFGAContextSupplier {
+
+    @Inject
+    Logger logger;
+
+    @Override
+    public Result getContext(@Nonnull AuthorizationModelClient client, @Nonnull RelTupleKey relTupleKey) {
+        logger.info("getContext called");
+        return new Result(Map.of(), List.of());
     }
 }
