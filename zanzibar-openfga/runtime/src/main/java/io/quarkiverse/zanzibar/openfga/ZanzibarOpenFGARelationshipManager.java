@@ -35,7 +35,7 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
 
         var tuples = relationships.stream()
                 .map(this::conditionalTupleKeyFromRelationship)
-                .collect(Collectors.toList());
+                .toList();
 
         return authorizationModelClient.write(tuples, null)
                 .replaceWithVoid();
@@ -58,15 +58,15 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
 
     TupleKey tupleKeyFromRelationship(Relationship relationship) {
         return TupleKey.of(
-                object(relationship.getObjectType(), relationship.getObjectId()),
-                relationship.getRelation(),
-                relationship.getUser());
+                object(relationship.objectType(), relationship.objectId()),
+                relationship.relation(),
+                object(relationship.userType(), relationship.userId()));
     }
 
     ConditionalTupleKey conditionalTupleKeyFromRelationship(Relationship relationship) {
         return ConditionalTupleKey.of(
-                object(relationship.getObjectType(), relationship.getObjectId()),
-                relationship.getRelation(),
-                relationship.getUser());
+                object(relationship.objectType(), relationship.objectId()),
+                relationship.relation(),
+                object(relationship.userType(), relationship.userId()));
     }
 }

@@ -10,33 +10,38 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.zanzibar.Relationship;
+import io.quarkiverse.zanzibar.RelationshipContextManager;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.UserIdExtractor;
+import io.quarkiverse.zanzibar.UserExtractor;
 
 public class ZanzibarSynchronousAuthorizationFilter extends ZanzibarAuthorizationFilter implements ContainerRequestFilter {
 
     private static final Logger log = Logger.getLogger(ZanzibarSynchronousAuthorizationFilter.class);
 
     public ZanzibarSynchronousAuthorizationFilter(Action action, RelationshipManager relationshipManager,
-            UserIdExtractor userIdExtractor,
+            RelationshipContextManager relationshipContextManager, UserExtractor userExtractor,
             Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout) {
-        super(action, relationshipManager, userIdExtractor, userType, unauthenticatedUserId, timeout);
+        super(action, relationshipManager, relationshipContextManager, userExtractor, userType, unauthenticatedUserId,
+                timeout);
     }
 
     @Override
     public void filter(ContainerRequestContext context) {
 
-        var checkOpt = prepare(context);
+        var prepared = prepare(context);
 
-        if (checkOpt.isEmpty()) {
+        if (prepared instanceof PrepareResult.Deny) {
             throw new ForbiddenException();
+        } else if (prepared instanceof PrepareResult.Pass) {
+            log.debugf("Authorization allowed, skipping check");
+            return;
         }
-        var check = checkOpt.get();
+
+        var relationship = ((PrepareResult.Check) prepared).relationship();
+
+        log.debugf("Authorizing %s", relationship);
 
         try {
-
-            var relationship = Relationship.of(check.objectType, check.objectId, check.relation, check.user);
 
             var allowed = relationshipManager.check(relationship)
                     .await().atMost(Duration.ofSeconds(10));

@@ -21,8 +21,9 @@ import jakarta.ws.rs.core.FeatureContext;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.zanzibar.RelationshipContextManager;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.UserIdExtractor;
+import io.quarkiverse.zanzibar.UserExtractor;
 import io.quarkiverse.zanzibar.annotations.*;
 import io.quarkiverse.zanzibar.jaxrs.ZanzibarAuthorizationFilter.Action;
 
@@ -32,8 +33,8 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
 
     public interface FilterFactory {
         ContainerRequestFilter create(Action annotations, RelationshipManager relationshipManager,
-                UserIdExtractor userIdExtractor, Optional<String> userType, Optional<String> unauthenticatedUserId,
-                Duration timeout);
+                RelationshipContextManager relationshipContextManager, UserExtractor userExtractor,
+                Optional<String> userType, Optional<String> unauthenticatedUserId, Duration timeout);
     }
 
     static class AnnotationQuery {
@@ -49,9 +50,8 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
         public boolean equals(Object o) {
             if (this == o)
                 return true;
-            if (!(o instanceof AnnotationQuery))
+            if (!(o instanceof AnnotationQuery that))
                 return false;
-            AnnotationQuery that = (AnnotationQuery) o;
             return source.equals(that.source) && annotationType.equals(that.annotationType);
         }
 
@@ -61,18 +61,12 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
         }
     }
 
-    static class Annotations {
-        final Optional<FGADynamicObject> dynamicObject;
-        final Optional<FGAObject> constantObject;
-        final Optional<FGARelation> relationAllowed;
-        final Optional<FGAUserType> userType;
+    record Annotations(Optional<FGAIgnore> ignore, Optional<FGADynamicObject> dynamicObject,
+            Optional<FGAObject> constantObject, Optional<FGARelation> relationAllowed,
+            Optional<FGAUserType> userType) {
 
-        Annotations(Optional<FGADynamicObject> dynamicObject, Optional<FGAObject> constantObject,
-                Optional<FGARelation> relationAllowed, Optional<FGAUserType> userType) {
-            this.dynamicObject = dynamicObject;
-            this.constantObject = constantObject;
-            this.relationAllowed = relationAllowed;
-            this.userType = userType;
+        boolean isIgnored() {
+            return ignore.isPresent();
         }
 
         boolean isEmpty() {
@@ -81,7 +75,8 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     }
 
     RelationshipManager relationshipManager;
-    UserIdExtractor userIdExtractor;
+    RelationshipContextManager relationshipContextManager;
+    UserExtractor userExtractor;
     Optional<String> unauthenticatedUserId;
     Duration timeout;
     boolean denyUnannotated;
@@ -91,11 +86,14 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     Map<Method, Annotations> authorizationAnnotationsCache = new ConcurrentHashMap<>();
     Map<AnnotationQuery, Optional<Annotation>> annotationQueryCache = new ConcurrentHashMap<>();
 
-    public ZanzibarDynamicFeature(RelationshipManager relationshipManager, UserIdExtractor userIdExtractor,
+    public ZanzibarDynamicFeature(RelationshipManager relationshipManager,
+            RelationshipContextManager relationshipContextManager, UserExtractor userExtractor,
             Optional<String> unauthenticatedUserId,
             Duration timeout, boolean denyUnannotated, FilterFactory filterFactory) {
+        this.relationshipContextManager = Objects.requireNonNull(relationshipContextManager,
+                "relationshipContextManager must not be null");
         this.relationshipManager = Objects.requireNonNull(relationshipManager, "relationshipManager must not be null");
-        this.userIdExtractor = Objects.requireNonNull(userIdExtractor, "userIdExtractor must not be null");
+        this.userExtractor = Objects.requireNonNull(userExtractor, "userIdExtractor must not be null");
         this.unauthenticatedUserId = unauthenticatedUserId;
         this.timeout = timeout;
         this.denyUnannotated = denyUnannotated;
@@ -112,17 +110,30 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
             return;
         }
 
+        if (annotations.isIgnored()) {
+            log.debugf("Excluding authorization check for %f, marked as ignored", resourceInfo.getResourceMethod());
+            return;
+        }
+
+        var action = getAction(resourceInfo, annotations);
+
+        Optional<String> userType = annotations.userType.map(FGAUserType::value);
+
+        var filter = filterCache.computeIfAbsent(action,
+                key -> filterFactory.create(key, relationshipManager, relationshipContextManager,
+                        userExtractor, userType, unauthenticatedUserId,
+                        timeout));
+
+        context.register(filter, Priorities.AUTHORIZATION);
+    }
+
+    private static Action getAction(ResourceInfo resourceInfo, Annotations annotations) {
+
         if (annotations.relationAllowed.isEmpty()) {
             String message = "No FGA relation specifier found for method " + resourceInfo.getResourceMethod();
             throw new IllegalStateException(message);
         }
         var relation = annotations.relationAllowed.get();
-
-        // Check for public/any access
-        if (annotations.relationAllowed.get().value().equals(FGARelation.ANY)) {
-            log.debugf("Skipping authorization checks for %f, any relation is allowed", resourceInfo.getResourceMethod());
-            return;
-        }
 
         Action action;
         if (annotations.constantObject.isPresent()) {
@@ -133,18 +144,16 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
             String message = "No FGA object specifier found for method " + resourceInfo.getResourceMethod();
             throw new IllegalStateException(message);
         }
-
-        Optional<String> userType = annotations.userType.map(FGAUserType::value);
-
-        var filter = filterCache.computeIfAbsent(action,
-                key -> filterFactory.create(key, relationshipManager, userIdExtractor, userType, unauthenticatedUserId,
-                        timeout));
-
-        context.register(filter, Priorities.AUTHORIZATION);
+        return action;
     }
 
     Annotations findAuthorizationAnnotations(ResourceInfo resourceInfo) {
         return authorizationAnnotationsCache.computeIfAbsent(resourceInfo.getResourceMethod(), key -> {
+
+            var ignoreAnn = findAnnotation(resourceInfo, FGAIgnore.class);
+            if (ignoreAnn.isPresent()) {
+                return new Annotations(ignoreAnn, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+            }
 
             var userTypeAnn = findAnnotation(resourceInfo, FGAUserType.class);
             var relationAllowedAnn = findAnnotation(resourceInfo, FGARelation.class);
@@ -181,7 +190,7 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
                 }
             }
 
-            return new Annotations(dynamicObjectAnn, constantObjectAnn, relationAllowedAnn, userTypeAnn);
+            return new Annotations(Optional.empty(), dynamicObjectAnn, constantObjectAnn, relationAllowedAnn, userTypeAnn);
         });
     }
 

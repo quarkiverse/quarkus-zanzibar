@@ -13,7 +13,7 @@ public class ZanzibarAuthzedResourceTest {
 
     @Test
     public void testHelloEndpoint() {
-        var jwt = Jwt.subject("user:some-guy").audience("everybody").sign();
+        var jwt = Jwt.subject("some-guy").groups("user").audience("everybody").sign();
 
         given()
                 .auth().preemptive().oauth2(jwt)
@@ -23,7 +23,7 @@ public class ZanzibarAuthzedResourceTest {
 
         given()
                 .auth().preemptive().oauth2(jwt)
-                .when().post("/authzed/authorize/user:some-guy?object=1&relation=reader")
+                .when().post("/authzed/authorize?object=1&relation=reader")
                 .then()
                 .statusCode(204);
 

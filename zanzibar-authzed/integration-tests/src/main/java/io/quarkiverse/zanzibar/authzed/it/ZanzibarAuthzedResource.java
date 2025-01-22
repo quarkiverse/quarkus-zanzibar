@@ -26,15 +26,20 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 
 import io.quarkiverse.zanzibar.Relationship;
+import io.quarkiverse.zanzibar.RelationshipContext;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
 import io.quarkiverse.zanzibar.annotations.FGARelation;
+import io.quarkiverse.zanzibar.annotations.FGAUserType;
 import io.smallrye.mutiny.Uni;
 
 @FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
+@FGAUserType("user")
 interface Things {
     @FGARelation(ANY)
-    Uni<Void> authorize(String user, String relation, String object);
+    @POST
+    @Path("authorize")
+    Uni<Void> authorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
 }
 
 @Path("/authzed")
@@ -44,12 +49,17 @@ public class ZanzibarAuthzedResource implements Things {
 
     @Inject
     RelationshipManager relationshipManager;
+    @Inject
+    RelationshipContext relationshipContext;
 
-    @POST
-    @Path("authorize/{user}")
-    public Uni<Void> authorize(@PathParam("user") String user, @QueryParam("relation") String relation,
-            @QueryParam("object") String object) {
-        return relationshipManager.add(List.of(Relationship.of("thing", object, relation, user)));
+    public Uni<Void> authorize(String relation, String objectId) {
+        String objectType = relationshipContext.objectType()
+                .orElseThrow(() -> new IllegalStateException("Object type not available in context"));
+        String userType = relationshipContext.userType()
+                .orElseThrow(() -> new IllegalStateException("User type not available in context"));
+        String userId = relationshipContext.userId()
+                .orElseThrow(() -> new IllegalStateException("User ID not available in context"));
+        return relationshipManager.add(List.of(Relationship.of(objectType, objectId, relation, userType, userId)));
     }
 
     @GET

@@ -30,7 +30,7 @@ class ThingResource {
         return thingRepository.createThing(name)
                 .flatMap((thing) -> {
                     // <4>
-                    var relationship = new Relationship("thing", thing.getId(), "owner", "user:" + principal.getName());
+                    var relationship = new Relationship("thing", thing.getId(), "owner", "user", principal.getName());
                     // <5>
                     return relationshipManager.add(List.of(relationship))
                             .map((unused) -> thing);

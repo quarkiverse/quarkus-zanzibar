@@ -9,19 +9,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Provides a user type to build user objects for checking.
- * <br>
- * Implementations such as OpenFGA require users to be objects. For example a user with id "1" that is of type
- * "user" it must be presented as "user:1"; this annotation provides the user type name.
+ * Indicates that the annotated method or class should be ignored by the FGA authorization filter.
  */
 @Inherited
 @Target({ TYPE, METHOD })
 @Retention(RUNTIME)
-public @interface FGAUserType {
-
-    /**
-     * Name of the user object type.
-     */
-    String value();
-
+public @interface FGAIgnore {
 }
