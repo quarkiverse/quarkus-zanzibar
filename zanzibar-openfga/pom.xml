@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
   <name>Quarkus Zanzibar - OpenFGA - Parent</name>
   <properties>
-    <openfga.version>3.0.0-RC</openfga.version>
+    <openfga.version>3.0.0</openfga.version>
   </properties>
   <modules>
     <module>deployment</module>
