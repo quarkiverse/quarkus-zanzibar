@@ -86,3 +86,19 @@ an object format such as `user:some-user-id` (for the user type is `user`).
 .User Object Type Requirements
 Currently only OpenFGA's 1.1 schema requires users in object format. The `@FGAUserType` will be required for
 all endpoints when using OpenFGA.
+
+=== Miscellaneous Annotations
+
+[cols="2"]
+|===
+| Annotation | Description
+
+| `FGAIgnore`
+a|
+Excludes the method from Zanzibar authorization filter.
+
+[NOTE]
+This an alternative to using `@FGARelation(ANY)`
+which still includes the method in the filter but skips the authorization check.
+
+|===

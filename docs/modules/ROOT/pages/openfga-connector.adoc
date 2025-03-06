@@ -6,12 +6,12 @@ include::./includes/attributes.adoc[]
 == Overview
 
 The OpenFGA Connector provides access to https://openfga.dev[OpenFGA] server instances or
-https://auth0.com/developers/lab/fine-grained-authorization[Auth0's managed authorization platform].
+https://auth0.com/fine-grained-authorization[Auth0's managed authorization platform].
 It relies upon the https://github.com/quarkiverse/quarkus-openfga-client[Quarkus OpenFGA Client].
 
 Currently there is no connector specific setup or configuration beyond installing the connector dependency.
 
-Visit the https://github.com/quarkiverse/quarkus-openfga-client[Quarkus OpenFGA Client] project for details on configuring the client to connect to your server or the Authzed platform.
+Visit the https://github.com/quarkiverse/quarkus-openfga-client[Quarkus OpenFGA Client] project for details on configuring the client to connect to your server or the OpenFGA platform.
 
 
 [#_installation]
