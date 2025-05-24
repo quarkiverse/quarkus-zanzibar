@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
   <name>Quarkus Zanzibar - Authzed - Parent</name>
   <properties>
-    <authzed.version>0.11.0</authzed.version>
+    <authzed.version>0.12.0</authzed.version>
   </properties>
   <modules>
     <module>deployment</module>
