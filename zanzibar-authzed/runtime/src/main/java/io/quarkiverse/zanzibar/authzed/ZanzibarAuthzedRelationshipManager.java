@@ -6,16 +6,15 @@ import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import com.authzed.api.v1.Core;
-import com.authzed.api.v1.Core.ObjectReference;
-import com.authzed.api.v1.Core.RelationshipUpdate;
-import com.authzed.api.v1.Core.RelationshipUpdate.Operation;
-import com.authzed.api.v1.Core.SubjectReference;
-import com.authzed.api.v1.PermissionService.CheckPermissionRequest;
-import com.authzed.api.v1.PermissionService.CheckPermissionResponse.Permissionship;
-import com.authzed.api.v1.PermissionService.Consistency;
-import com.authzed.api.v1.PermissionService.WriteRelationshipsRequest;
-import com.authzed.api.v1.PermissionService.WriteRelationshipsResponse;
+import com.authzed.api.v1.CheckPermissionRequest;
+import com.authzed.api.v1.CheckPermissionResponse.Permissionship;
+import com.authzed.api.v1.Consistency;
+import com.authzed.api.v1.ObjectReference;
+import com.authzed.api.v1.RelationshipUpdate;
+import com.authzed.api.v1.RelationshipUpdate.Operation;
+import com.authzed.api.v1.SubjectReference;
+import com.authzed.api.v1.WriteRelationshipsRequest;
+import com.authzed.api.v1.WriteRelationshipsResponse;
 
 import io.quarkiverse.authzed.client.AuthzedClient;
 import io.quarkiverse.zanzibar.Relationship;
@@ -68,8 +67,8 @@ public class ZanzibarAuthzedRelationshipManager implements RelationshipManager {
                 .collect(Collectors.toList())).with(WriteRelationshipsResponse.class, r -> null);
     }
 
-    static com.authzed.api.v1.Core.Relationship toAutzedRelationship(Relationship relationship) {
-        return Core.Relationship.newBuilder()
+    static com.authzed.api.v1.Relationship toAutzedRelationship(Relationship relationship) {
+        return com.authzed.api.v1.Relationship.newBuilder()
                 .setRelation(relationship.relation())
                 .setResource(ObjectReference.newBuilder()
                         .setObjectId(relationship.objectId())
