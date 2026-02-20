@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse</groupId>
     <artifactId>quarkiverse-parent</artifactId>
-    <version>20</version>
+    <version>21</version>
   </parent>
   <groupId>io.quarkiverse.zanzibar</groupId>
   <artifactId>quarkus-zanzibar-parent</artifactId>
@@ -47,6 +47,7 @@
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-maven-plugin</artifactId>
           <version>${quarkus.version}</version>
+          <extensions>true</extensions>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
