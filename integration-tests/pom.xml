@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse.zanzibar</groupId>
     <artifactId>quarkus-zanzibar-parent</artifactId>
-    <version>2.9.0</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>quarkus-zanzibar-integration-tests</artifactId>
   <name>Quarkus Zanzibar - Integration Tests</name>
