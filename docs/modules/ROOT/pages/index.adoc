@@ -5,8 +5,8 @@ include::./includes/attributes.adoc[]
 == Overview
 
 The **Quarkus Zanzibar** extension provides https://zanzibar.academy[Zanzibar] style Fine Grain
-Authorization (FGA) capabilities for Quarkus' HTTP subsystems. An authorization filter and dedicated
-annotations are provided to provide easy integration of Zanzibar style FGA into applications.
+Authorization (FGA) capabilities for Quarkus' HTTP subsystems. It integrates with Quarkus'
+standard `@PermissionsAllowed` authorization using `ZanzibarPermission` implementations.
 
 The extension only provides the framework and relies on dedicated connectors to communicate with specific
 Zanzibar style servers.
@@ -18,7 +18,8 @@ Supported APIs and platforms:
 
 == Installation
 
-Adding the `quarkus-zanzibar` extension to your project only provides access to the authorization and the annotations needed to configure authorization on your resource classes and methods.
+Adding the `quarkus-zanzibar` extension to your project provides the authorization integration and the APIs
+needed to configure permission checks on your resource classes and methods.
 
 To communicate with your selected server API you will need to add the Zanzibar connector for your selected server.
 
@@ -39,8 +40,8 @@ include::{examples-dir}/schema.fga[]
 
 === Creating and Accessing Objects
 
-With a suitable authorization model initialized in your selected server, Zanzibar uses JAX-RS annotations to
-define the exact authorization details for resource methods.
+With a suitable authorization model initialized in your selected server, Zanzibar uses `@PermissionsAllowed`
+and `ZanzibarPermission` to define the exact authorization details for resource methods.
 
 Using the authorization model from above. The following resource methods allow any user to create new
 things but only users with `read` access to fetch them; in this example this will be the `owner` of the `Thing`.
@@ -51,17 +52,16 @@ include::{examples-dir}/ThingResource.java[]
 ----
 <1> Inject `RelationshipManager` to allow adding & removing relationships.
 <2> Inject `Principal` for access to the current user id.
-<3> `FGARelation.ANY` allows access for any user, disregarding the authorization model.
-<4> Create a `Relationship` that defines the current user as the `owner` of the newly created `Thing`.
-<5> Add the new thing's `owner` relationship to the authorization model.
-<6> Dynamically determine the id of the `Thing` to authorize from the `id` path parameter of the current HTTP request. Additionally, set the object type to `thing` as defined by the authorization model.
-<7> Check if the current user has the `owner` relation for the `thing` dynamically determined by the `@FGAPathObject`.
-<8> For implementations that require it, provide the user object type.
+<3> Create a `Relationship` that defines the current user as the `owner` of the newly created `Thing`.
+<4> Add the new thing's `owner` relationship to the authorization model.
+<5> Use `@PermissionsAllowed` to declare the required relation (`owner`) for the request.
+<6> A `ZanzibarPermission` implementation provides the object type (`thing`).
+<7> A `ZanzibarPermission` implementation provides the object id (from the method parameter).
+<8> For implementations that require it, provide the user object type via `ZanzibarPermission#getUserType()`.
 
 === More Details
 
-Zanzibar provides a number of annotations to determine the current object id and object type. The annotations
-are detailed xref:annotations.adoc[here].
+Zanzibar permissions and configuration details are described xref:annotations.adoc[here].
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference

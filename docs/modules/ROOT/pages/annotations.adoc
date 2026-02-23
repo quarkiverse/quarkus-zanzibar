@@ -1,104 +1,55 @@
-= Quarkus Zanzibar Annotations
+= Quarkus Zanzibar Permissions
 
-Zanzibar annotations are compatible with both of Quarkus' JAX-RS implementations, https://quarkus.io/guides/resteasy-reactive[RESTEasy Reactive] and https://quarkus.io/guides/resteasy[RESTEasy (Classic)].
+Zanzibar authorization integrates with Quarkus' standard `@PermissionsAllowed` mechanism. Endpoints declare the required
+relation using the permission name, and a `ZanzibarPermission` implementation provides the object type and id.
 
-The annotations are modeled after JAX-RS Role-Based Access Control annotations and will be familiar to those who have
-used them. The main difference being that Zanzibar FGA annotations can dynamically determine their values from the
-current HTTP request.
+== Usage
 
-== Resource Method Annotations
+[source,java]
+----
+@PermissionsAllowed(value = "viewer", permission = TenantPermission.class)
+public Tenant getTenant(String tenantId) { ... }
 
-Zanzibar style authorization requires 4 distinct pieces of information: the *object type* & *object id*,
-*relation type* and the *user id*. The extension provides resource method annotations to configure how the
-object and relation properties are determined from the current HTTP request and uses the standard authentication
-features of Quarkus to determine the user.
+public final class TenantPermission extends ZanzibarPermission {
+    private final String tenantId;
 
-The resource method annotations can be placed on a single method or on a class to affect all methods of the class.
+    public TenantPermission(String name, String tenantId) {
+        super(name);
+        this.tenantId = tenantId;
+    }
 
-=== Object Type & ID Properties
-The Zanzibar extension provides a number of annotations to determine the object type & id from the current request.
+    @Override
+    public String getObjectType() { return "tenant"; }
 
-[cols="4"]
-|===
-| Annotation | Description | Object Id Source | Object Type Source
+    @Override
+    public String getObjectId() { return tenantId; }
+}
+----
 
-| `FGAPathObject`
-| Dynamically inspects the HTTP request path parameters.
-| Request path parameter.
-| Annotation constant.
+== User Type
 
-| `FGAQueryObject`
-| Dynamically inspects the HTTP request query parameters.
-| Request query parameter.
-| Annotation constant.
+Some FGA backends require a user type. You can override it in the permission:
 
-| `FGAHeaderObject`
-| Dynamically inspects the HTTP request header values.
-| Request header value.
-| Annotation constant.
+[source,java]
+----
+@Override
+public Optional<String> getUserType() {
+    return Optional.of("user");
+}
+----
 
-| `FGARequestObject`
-| Dynamically inspects the generic HTTP request properties.
-| Request property.
-| Annotation constant.
+You can also configure a default user type globally and per resource class. Resolution order is:
+permission override > resource default > global default.
 
-| `FGAObject`
-| Statically provides both properties in the Zanzibar annotation.
-| Annotation constant.
-| Annotation constant.
-|===
+[source,properties]
+----
+quarkus.zanzibar.default-user-type=global
+quarkus.zanzibar.default-user-types."com.acme.MyResource".user-type=customer
+----
 
-While these annotations provide a large amount of options sometimes custom support will be needed; currently you can use `FGARequestObject` to achieve this. Any filter or other request interception method that runs before Zanzibar's authorization filer can store a property against the current request and then extract the value using the `FGARequestObject` annotation.
+== Check Context
 
-=== Relation Type Properties
-
-The relation is specified using a single annotation providing the relation as a constant.
-
-[cols="3"]
-|===
-| Annotation | Description | Relation Type Source
-
-| `FGARelation`
-| Statically provides the relation type properties in the Zanzibar annotation.
-| Annotation constant.
-
-|===
-
-=== User Type Properties
-
-The user type is specified using a single annotation providing the type name as a constant.
-
-Certain FGA implementations require the user to be provided as an object. For example instead of
-providing a user with id `some-user-id` as simply `some-user-id`, it requires the user to be in
-an object format such as `user:some-user-id` (for the user type is `user`).
-
-[cols="3"]
-|===
-| Annotation | Description | Relation Type Source
-
-| `FGAUserType`
-| Statically provides the user type name in the Zanzibar annotation.
-| Annotation constant.
-
-|===
-
-[NOTE]
-.User Object Type Requirements
-Currently only OpenFGA's 1.1 schema requires users in object format. The `@FGAUserType` will be required for
-all endpoints when using OpenFGA.
-
-=== Miscellaneous Annotations
-
-[cols="2"]
-|===
-| Annotation | Description
-
-| `FGAIgnore`
-a|
-Excludes the method from Zanzibar authorization filter.
-
-[NOTE]
-This an alternative to using `@FGARelation(ANY)`
-which still includes the method in the filter but skips the authorization check.
-
-|===
+ZanzibarPermission can supply per-endpoint context and contextual tuples. A CDI
+`RelationshipCheckContextSupplier` can also contribute global/request-scoped context.
+When both are present, permission context overrides supplier context keys and supplier
+contextual tuples are applied before permission tuples.

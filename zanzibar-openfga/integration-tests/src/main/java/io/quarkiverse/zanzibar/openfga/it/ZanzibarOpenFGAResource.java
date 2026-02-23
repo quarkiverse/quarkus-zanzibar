@@ -16,99 +16,79 @@
  */
 package io.quarkiverse.zanzibar.openfga.it;
 
-import static io.quarkiverse.zanzibar.annotations.FGADynamicObject.Source.PATH;
-import static io.quarkiverse.zanzibar.annotations.FGARelation.ANY;
-
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestQuery;
 
-import io.quarkiverse.openfga.client.AuthorizationModelClient;
-import io.quarkiverse.openfga.client.model.RelTupleKey;
 import io.quarkiverse.zanzibar.Relationship;
-import io.quarkiverse.zanzibar.RelationshipContext;
+import io.quarkiverse.zanzibar.RelationshipCheckContext;
+import io.quarkiverse.zanzibar.RelationshipCheckContextSupplier;
 import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
-import io.quarkiverse.zanzibar.annotations.FGARelation;
-import io.quarkiverse.zanzibar.annotations.FGAUserType;
-import io.quarkiverse.zanzibar.openfga.OpenFGAContextSupplier;
+import io.quarkiverse.zanzibar.UserExtractor;
+import io.quarkus.security.PermissionsAllowed;
+import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
-
-@FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
-interface Things {
-    @FGARelation(ANY)
-    @POST
-    @Path("ann/authorize")
-    @FGAUserType("user")
-    Uni<Void> annotationAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
-
-    @FGARelation(ANY)
-    @POST
-    @Path("jwt/authorize")
-    Uni<Void> jwtAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
-}
 
 @Path("/openfga")
 @ApplicationScoped
-@FGARelation("reader")
-public class ZanzibarOpenFGAResource implements Things {
+public class ZanzibarOpenFGAResource {
 
     @Inject
     RelationshipManager relationshipManager;
     @Inject
-    RelationshipContext relationshipContext;
+    UserExtractor userExtractor;
+    @Inject
+    SecurityIdentity identity;
 
-    @Override
-    public Uni<Void> annotationAuthorize(String relation, String objectId) {
-        return authorize(relation, objectId);
+    @GET
+    @Path("contextual/things/{objectId}")
+    @PermissionsAllowed(value = "reader", permission = ContextualTuplesPermission.class)
+    public String contextualThing(@RestPath String objectId, @RestQuery String userId) {
+        return "Thing " + objectId;
     }
 
-    @Override
-    public Uni<Void> jwtAuthorize(String relation, String objectId) {
-        return authorize(relation, objectId);
+    @GET
+    @Path("context/things/{objectId}")
+    @PermissionsAllowed(value = "reader", permission = ContextMergePermission.class)
+    public String contextThing(@RestPath String objectId) {
+        return "Thing " + objectId;
     }
 
-    public Uni<Void> authorize(String relation, String objectId) {
-        String objectType = relationshipContext.objectType()
-                .orElseThrow(() -> new IllegalStateException("Object type not available in context"));
-        String userType = relationshipContext.userType()
-                .orElseThrow(() -> new IllegalStateException("User type not available in context"));
-        String userId = relationshipContext.userId()
-                .orElseThrow(() -> new IllegalStateException("User ID not available in context"));
-        var relationship = Relationship.of(objectType, objectId, relation, userType, userId);
+    @POST
+    @Path("jwt/authorize")
+    public Uni<Void> jwtAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId) {
+        var user = userExtractor.extractUser(identity.getPrincipal(), null)
+                .orElseThrow(() -> new IllegalStateException("User not available"));
+        var relationship = Relationship.of("thing", objectId, relation, user.type(), user.id());
         return relationshipManager.add(List.of(relationship));
-    }
-
-    @GET
-    @Path("ann/things/{id}")
-    @FGAUserType("user")
-    public String annotationGetThing(@PathParam("id") String id) {
-        return "Thing " + id;
-    }
-
-    @GET
-    @Path("jwt/things/{id}")
-    public String jwtGetThing(@PathParam("id") String id) {
-        return "Thing " + id;
     }
 }
 
 @ApplicationScoped
-class ContextSupplier implements OpenFGAContextSupplier {
+class ContextSupplier implements RelationshipCheckContextSupplier {
 
     @Inject
     Logger logger;
 
     @Override
-    public Result getContext(@Nonnull AuthorizationModelClient client, @Nonnull RelTupleKey relTupleKey) {
+    public RelationshipCheckContext get() {
         logger.info("getContext called");
-        return new Result(Map.of(), List.of());
+        return new RelationshipCheckContext(
+                Map.of(
+                        "k1", "supplier",
+                        "k3", "supplier"),
+                List.of(Relationship.of("thing", "supplier", "reader", "user", "supplier")),
+                Map.of());
     }
+
 }
