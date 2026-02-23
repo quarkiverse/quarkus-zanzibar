@@ -5,9 +5,8 @@ import java.util.Optional;
 /**
  * Injectable context for accessing relationship-based authorization information.
  * <p>
- * For authorized requests, all the methods will return a non-empty value. For requests that do not require
- * authorization (e.g., when using {@link io.quarkiverse.zanzibar.annotations.FGARelation#ANY}, some methods may
- * return an empty value.
+ * For authorized requests, all the methods will return a non-empty value. For requests that are not authorized,
+ * these values may be unavailable.
  * <p>
  * The provided properties can be used to make dynamic authorization updates or checks without duplicating the
  * configuration. For example, adding a relationship based on the current user and/or object and/or relation that
