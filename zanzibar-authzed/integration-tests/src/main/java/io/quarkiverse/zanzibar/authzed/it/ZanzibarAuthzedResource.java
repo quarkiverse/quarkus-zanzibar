@@ -16,55 +16,75 @@
  */
 package io.quarkiverse.zanzibar.authzed.it;
 
-import static io.quarkiverse.zanzibar.annotations.FGADynamicObject.Source.PATH;
-import static io.quarkiverse.zanzibar.annotations.FGARelation.ANY;
-
-import java.util.List;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 
-import io.quarkiverse.zanzibar.Relationship;
-import io.quarkiverse.zanzibar.RelationshipContext;
-import io.quarkiverse.zanzibar.RelationshipManager;
-import io.quarkiverse.zanzibar.annotations.FGADynamicObject;
-import io.quarkiverse.zanzibar.annotations.FGARelation;
-import io.quarkiverse.zanzibar.annotations.FGAUserType;
+import com.authzed.api.v1.ContextualizedCaveat;
+import com.authzed.api.v1.ObjectReference;
+import com.authzed.api.v1.RelationshipUpdate;
+import com.authzed.api.v1.RelationshipUpdate.Operation;
+import com.authzed.api.v1.SubjectReference;
+import com.authzed.api.v1.WriteRelationshipsRequest;
+
+import io.quarkiverse.authzed.client.AuthzedClient;
+import io.quarkus.security.PermissionsAllowed;
 import io.smallrye.mutiny.Uni;
-
-@FGADynamicObject(source = PATH, sourceProperty = "id", type = "thing")
-@FGAUserType("user")
-interface Things {
-    @FGARelation(ANY)
-    @POST
-    @Path("authorize")
-    Uni<Void> authorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
-}
 
 @Path("/authzed")
 @ApplicationScoped
-@FGARelation("reader")
-public class ZanzibarAuthzedResource implements Things {
+public class ZanzibarAuthzedResource {
 
     @Inject
-    RelationshipManager relationshipManager;
-    @Inject
-    RelationshipContext relationshipContext;
+    AuthzedClient authzedClient;
 
-    public Uni<Void> authorize(String relation, String objectId) {
-        String objectType = relationshipContext.objectType()
-                .orElseThrow(() -> new IllegalStateException("Object type not available in context"));
-        String userType = relationshipContext.userType()
-                .orElseThrow(() -> new IllegalStateException("User type not available in context"));
-        String userId = relationshipContext.userId()
-                .orElseThrow(() -> new IllegalStateException("User ID not available in context"));
-        return relationshipManager.add(List.of(Relationship.of(objectType, objectId, relation, userType, userId)));
+    @POST
+    @Path("caveat/authorize")
+    public Uni<Void> authorizeCaveat(@QueryParam("relation") String relation, @QueryParam("object") String objectId,
+            @QueryParam("user") String userId) {
+        var relationship = com.authzed.api.v1.Relationship.newBuilder()
+                .setRelation(relation)
+                .setResource(ObjectReference.newBuilder()
+                        .setObjectType("thing")
+                        .setObjectId(objectId)
+                        .build())
+                .setSubject(SubjectReference.newBuilder()
+                        .setObject(ObjectReference.newBuilder()
+                                .setObjectType("user")
+                                .setObjectId(userId)
+                                .build())
+                        .build())
+                .setOptionalCaveat(ContextualizedCaveat.newBuilder()
+                        .setCaveatName("region_is_us")
+                        .build())
+                .build();
+
+        var request = WriteRelationshipsRequest.newBuilder()
+                .addUpdates(RelationshipUpdate.newBuilder()
+                        .setOperation(Operation.OPERATION_CREATE)
+                        .setRelationship(relationship)
+                        .build())
+                .build();
+
+        return authzedClient.v1().permissionService().writeRelationships(request)
+                .replaceWithVoid();
     }
 
     @GET
-    @Path("things/{id}")
-    public String getThing(@PathParam("id") String id) {
+    @Path("caveat/things/{id}")
+    @PermissionsAllowed(value = "caveated_reader", permission = CaveatedThingPermission.class)
+    public String getCaveatedThing(@PathParam("id") String id) {
+        return "Thing " + id;
+    }
+
+    @GET
+    @Path("caveat-missing/things/{id}")
+    @PermissionsAllowed(value = "caveated_reader", permission = MissingContextThingPermission.class)
+    public String getCaveatedThingMissingContext(@PathParam("id") String id) {
         return "Thing " + id;
     }
 }

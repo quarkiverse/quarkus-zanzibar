@@ -1,21 +1,18 @@
 package io.quarkiverse.zanzibar.deployment;
 
 import java.security.Principal;
+import java.util.Map;
 
 import io.quarkiverse.zanzibar.UserExtractor;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
+import io.smallrye.config.WithDefaults;
 
 @ConfigRoot(phase = ConfigPhase.BUILD_TIME)
 @ConfigMapping(prefix = "quarkus.zanzibar")
 public interface ZanzibarConfig {
-
-    /**
-     * Configuration for JAX-RS authorization filter.
-     */
-    JAXRSFilterConfig filter();
 
     /**
      * Enable extraction of the user type from the {@link Principal#getName()}.
@@ -46,4 +43,26 @@ public interface ZanzibarConfig {
      */
     @WithDefault("true")
     boolean extractUserTypeFromRoles();
+
+    /**
+     * Default user type used when none can be extracted from the principal.
+     */
+    @WithDefault("user")
+    String defaultUserType();
+
+    /**
+     * Per-resource default user type configuration.
+     * <p>
+     * Example: quarkus.zanzibar.default-user-types."com.acme.MyResource".user-type=customer
+     */
+    @WithDefaults
+    Map<String, DefaultUserType> defaultUserTypes();
+
+    interface DefaultUserType {
+        /**
+         * Default user type for a specific resource class.
+         */
+        @WithDefault("${quarkus.zanzibar.default-user-type}")
+        String userType();
+    }
 }

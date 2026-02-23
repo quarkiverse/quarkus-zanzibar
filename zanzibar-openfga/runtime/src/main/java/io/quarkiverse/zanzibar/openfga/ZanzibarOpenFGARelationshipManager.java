@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import io.quarkiverse.openfga.client.AuthorizationModelClient;
@@ -13,37 +12,42 @@ import io.quarkiverse.openfga.client.model.RelObject;
 import io.quarkiverse.openfga.client.model.RelTupleDefinition;
 import io.quarkiverse.openfga.client.model.RelTupleKey;
 import io.quarkiverse.openfga.client.model.RelUser;
+import io.quarkiverse.zanzibar.ContextAwareRelationshipManager;
 import io.quarkiverse.zanzibar.Relationship;
+import io.quarkiverse.zanzibar.RelationshipCheckContext;
 import io.quarkiverse.zanzibar.RelationshipManager;
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
-public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
+public class ZanzibarOpenFGARelationshipManager implements RelationshipManager, ContextAwareRelationshipManager {
 
     private final AuthorizationModelClient authorizationModelClient;
-    private final OpenFGAContextSupplier contextSupplier;
 
     @Inject
-    public ZanzibarOpenFGARelationshipManager(AuthorizationModelClient authorizationModelClient,
-            Instance<OpenFGAContextSupplier> contextSuppliers) {
+    public ZanzibarOpenFGARelationshipManager(AuthorizationModelClient authorizationModelClient) {
         this.authorizationModelClient = authorizationModelClient;
-        if (contextSuppliers.isResolvable()) {
-            this.contextSupplier = contextSuppliers.get();
-        } else {
-            this.contextSupplier = null;
-        }
     }
 
     public Uni<Boolean> check(Relationship relationship) {
+        return check(relationship, RelationshipCheckContext.empty());
+    }
+
+    @Override
+    public Uni<Boolean> check(Relationship relationship, RelationshipCheckContext context) {
 
         var relTupleKey = tupleKeyFromRelationship(relationship);
 
         CheckOptions options = CheckOptions.DEFAULT;
-        if (contextSupplier != null) {
-
-            var supplied = contextSupplier.getContext(authorizationModelClient, relTupleKey);
-
-            options = CheckOptions.withContext(supplied.context()).contextualTuples(supplied.contextualTuples());
+        if (context != null) {
+            if (!context.context().isEmpty()) {
+                options = options.context(context.context());
+            }
+            if (!context.contextualTuples().isEmpty()) {
+                var tuples = context.contextualTuples().stream()
+                        .map(this::tupleDefinitionFromRelationship)
+                        .toList();
+                options = options.contextualTuples(tuples);
+            }
         }
 
         return authorizationModelClient.check(relTupleKey, options);

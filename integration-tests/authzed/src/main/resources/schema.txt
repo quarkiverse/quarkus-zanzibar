@@ -1,0 +1,17 @@
+caveat region_is_us(region string) {
+  region == "us"
+}
+
+definition user {}
+definition global {}
+definition resource {}
+definition perm {}
+
+definition thing {
+  relation reader: user | global | resource | perm
+  relation caveated_reader: user with region_is_us
+  relation writer: user | global | resource | perm
+  relation ower: user | global | resource | perm
+  permission read = reader + writer + caveated_reader
+  permission write = writer
+}

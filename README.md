@@ -8,7 +8,8 @@
 
 ## Overview
 
-The **Quarkus Zanzibar** extension provides Zanzibar style Fine Grain Authorization (FGA) capabilities for Quarkus. An authorization filter and dedicated annotations are provided to provide easy integration of Zanzibar style FGA into applications.
+The **Quarkus Zanzibar** extension provides Zanzibar style Fine Grain Authorization (FGA) capabilities for Quarkus.
+Authorization is integrated with Quarkus' standard `@PermissionsAllowed` mechanism using `ZanzibarPermission` implementations.
 
 The extension only provides the framework and relies on dedicated connectors to communicate with specific Zanzibar style
 APIs.
@@ -23,10 +24,18 @@ Supported APIs:
 The documentation for this extension can be found
 [here](https://quarkiverse.github.io/quarkiverse-docs/quarkus-zanzibar/dev/index.html).
 
+## Integration Tests
+
+Connector-agnostic integration tests live in the `integration-tests` module. They are executed twice during
+`mvn clean install` (OpenFGA + Authzed). To run them explicitly for each connector:
+
+- `mvn -pl integration-tests -Popenfga -Dquarkus.profile=openfga -DskipCommonITs=false test`
+- `mvn -pl integration-tests -Pauthzed,!openfga -Dquarkus.profile=authzed -DskipCommonITs=false test`
+
 ## Dependency
 
-Adding the `quarkus-zanzibar` extension to your project only provides access to the authorization and the annotations
-needed to configure authorization on your resource classes and methods.
+Adding the `quarkus-zanzibar` extension to your project provides the runtime authorization integration and APIs
+needed to configure permission checks on your resource classes and methods.
 
 To communicate with your selected API you will need to add a connector for OpenFGA or Authzed.
 

@@ -12,24 +12,30 @@ import io.smallrye.jwt.build.Jwt;
 public class ZanzibarAuthzedResourceTest {
 
     @Test
-    public void testHelloEndpoint() {
-        var jwt = Jwt.subject("some-guy").groups("user").audience("everybody").sign();
+    public void testCaveatedPermissionRequiresContext() {
+        var jwt = Jwt.subject("caveat-guy").groups("user").audience("everybody").sign();
 
         given()
                 .auth().preemptive().oauth2(jwt)
-                .when().get("/authzed/things/1")
+                .when().get("/authzed/caveat/things/1")
                 .then()
                 .statusCode(403);
 
         given()
                 .auth().preemptive().oauth2(jwt)
-                .when().post("/authzed/authorize?object=1&relation=reader")
+                .when().post("/authzed/caveat/authorize?object=1&relation=caveated_reader&user=caveat-guy")
                 .then()
                 .statusCode(204);
 
         given()
                 .auth().preemptive().oauth2(jwt)
-                .when().get("/authzed/things/1")
+                .when().get("/authzed/caveat-missing/things/1")
+                .then()
+                .statusCode(403);
+
+        given()
+                .auth().preemptive().oauth2(jwt)
+                .when().get("/authzed/caveat/things/1")
                 .then()
                 .statusCode(200)
                 .body(is("Thing 1"));
