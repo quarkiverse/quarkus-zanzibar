@@ -54,6 +54,10 @@ public class DefaultUserExtractor implements UserExtractor {
     UserInfo extractUserInfoFromPrincipal(Principal principal) {
 
         var name = principal.getName();
+        if (name == null) {
+            return new UserInfo(Optional.empty(), Optional.empty());
+        }
+
         if (extractUserTypeFromName) {
             var parts = name.split(userTypeSeparator);
             if (parts.length != 2) {
