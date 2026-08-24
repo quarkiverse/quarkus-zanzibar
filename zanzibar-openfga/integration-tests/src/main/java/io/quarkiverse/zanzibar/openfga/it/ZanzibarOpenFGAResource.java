@@ -49,6 +49,13 @@ interface Things {
     @FGAUserType("user")
     Uni<Void> annotationAuthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
 
+    /** Removes the annotated user's relationship to an object. */
+    @FGARelation(ANY)
+    @DELETE
+    @Path("ann/authorize")
+    @FGAUserType("user")
+    Uni<Void> annotationUnauthorize(@QueryParam("relation") String relation, @QueryParam("object") String objectId);
+
     @FGARelation(ANY)
     @POST
     @Path("jwt/authorize")
@@ -71,19 +78,27 @@ public class ZanzibarOpenFGAResource implements Things {
     }
 
     @Override
+    public Uni<Void> annotationUnauthorize(String relation, String objectId) {
+        return relationshipManager.remove(List.of(relationship(relation, objectId)));
+    }
+
+    @Override
     public Uni<Void> jwtAuthorize(String relation, String objectId) {
         return authorize(relation, objectId);
     }
 
     public Uni<Void> authorize(String relation, String objectId) {
+        return relationshipManager.add(List.of(relationship(relation, objectId)));
+    }
+
+    private Relationship relationship(String relation, String objectId) {
         String objectType = relationshipContext.objectType()
                 .orElseThrow(() -> new IllegalStateException("Object type not available in context"));
         String userType = relationshipContext.userType()
                 .orElseThrow(() -> new IllegalStateException("User type not available in context"));
         String userId = relationshipContext.userId()
                 .orElseThrow(() -> new IllegalStateException("User ID not available in context"));
-        var relationship = Relationship.of(objectType, objectId, relation, userType, userId);
-        return relationshipManager.add(List.of(relationship));
+        return Relationship.of(objectType, objectId, relation, userType, userId);
     }
 
     @GET

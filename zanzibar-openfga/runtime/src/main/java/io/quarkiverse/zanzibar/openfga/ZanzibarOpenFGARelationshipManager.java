@@ -1,5 +1,7 @@
 package io.quarkiverse.zanzibar.openfga;
 
+import static io.quarkiverse.openfga.client.model.WriteConflictBehavior.IGNORE;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +11,7 @@ import jakarta.inject.Inject;
 
 import io.quarkiverse.openfga.client.AuthorizationModelClient;
 import io.quarkiverse.openfga.client.AuthorizationModelClient.CheckOptions;
+import io.quarkiverse.openfga.client.AuthorizationModelClient.WriteOptions;
 import io.quarkiverse.openfga.client.model.RelObject;
 import io.quarkiverse.openfga.client.model.RelTupleDefinition;
 import io.quarkiverse.openfga.client.model.RelTupleKey;
@@ -26,12 +29,13 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
     @Inject
     public ZanzibarOpenFGARelationshipManager(AuthorizationModelClient authorizationModelClient,
             Instance<OpenFGAContextSupplier> contextSuppliers) {
+        this(authorizationModelClient, contextSuppliers.isResolvable() ? contextSuppliers.get() : null);
+    }
+
+    ZanzibarOpenFGARelationshipManager(AuthorizationModelClient authorizationModelClient,
+            OpenFGAContextSupplier contextSupplier) {
         this.authorizationModelClient = authorizationModelClient;
-        if (contextSuppliers.isResolvable()) {
-            this.contextSupplier = contextSuppliers.get();
-        } else {
-            this.contextSupplier = null;
-        }
+        this.contextSupplier = contextSupplier;
     }
 
     public Uni<Boolean> check(Relationship relationship) {
@@ -56,7 +60,7 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
                 .map(this::tupleDefinitionFromRelationship)
                 .toList();
 
-        return authorizationModelClient.write(tuples, null)
+        return authorizationModelClient.write(tuples, WriteOptions.withOnDuplicate(IGNORE))
                 .replaceWithVoid();
     }
 
@@ -67,7 +71,7 @@ public class ZanzibarOpenFGARelationshipManager implements RelationshipManager {
                 .map(this::tupleKeyFromRelationship)
                 .collect(Collectors.toList());
 
-        return authorizationModelClient.write(null, tuples)
+        return authorizationModelClient.write(null, tuples, WriteOptions.withOnMissing(IGNORE))
                 .replaceWithVoid();
     }
 
