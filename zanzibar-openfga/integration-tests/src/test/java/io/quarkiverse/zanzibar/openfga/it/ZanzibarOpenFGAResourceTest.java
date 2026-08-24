@@ -23,6 +23,18 @@ public class ZanzibarOpenFGAResourceTest {
 
         given()
                 .auth().preemptive().oauth2(jwt)
+                .when().delete("/openfga/ann/authorize?object=1&relation=reader")
+                .then()
+                .statusCode(204);
+
+        given()
+                .auth().preemptive().oauth2(jwt)
+                .when().post("/openfga/ann/authorize?object=1&relation=reader")
+                .then()
+                .statusCode(204);
+
+        given()
+                .auth().preemptive().oauth2(jwt)
                 .when().post("/openfga/ann/authorize?object=1&relation=reader")
                 .then()
                 .statusCode(204);
@@ -33,6 +45,24 @@ public class ZanzibarOpenFGAResourceTest {
                 .then()
                 .statusCode(200)
                 .body(is("Thing 1"));
+
+        given()
+                .auth().preemptive().oauth2(jwt)
+                .when().delete("/openfga/ann/authorize?object=1&relation=reader")
+                .then()
+                .statusCode(204);
+
+        given()
+                .auth().preemptive().oauth2(jwt)
+                .when().delete("/openfga/ann/authorize?object=1&relation=reader")
+                .then()
+                .statusCode(204);
+
+        given()
+                .auth().preemptive().oauth2(jwt)
+                .when().get("/openfga/ann/things/1")
+                .then()
+                .statusCode(403);
     }
 
     @Test
