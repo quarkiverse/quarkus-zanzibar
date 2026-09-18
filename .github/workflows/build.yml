@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "codex/release-*"
     paths-ignore:
       - '.gitignore'
       - 'CODEOWNERS'
