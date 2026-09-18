@@ -103,15 +103,15 @@ public class ZanzibarDynamicFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         var annotations = findAuthorizationAnnotations(resourceInfo);
+        if (annotations.isIgnored()) {
+            log.debugf("Excluding authorization check for %s, marked as ignored", resourceInfo.getResourceMethod());
+            return;
+        }
+
         if (annotations.isEmpty()) {
             if (denyUnannotated) {
                 context.register(ZanzibarDenyFilter.INSTANCE);
             }
-            return;
-        }
-
-        if (annotations.isIgnored()) {
-            log.debugf("Excluding authorization check for %f, marked as ignored", resourceInfo.getResourceMethod());
             return;
         }
 

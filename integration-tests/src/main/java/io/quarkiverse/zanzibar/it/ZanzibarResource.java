@@ -20,6 +20,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 
+import io.quarkiverse.zanzibar.annotations.FGAIgnore;
+
 @Path("/zanzibar")
 @ApplicationScoped
 public class ZanzibarResource {
@@ -28,5 +30,13 @@ public class ZanzibarResource {
     @GET
     public String hello() {
         return "Hello zanzibar";
+    }
+
+    /** Endpoint that explicitly skips FGA authorization. */
+    @GET
+    @Path("ignored")
+    @FGAIgnore
+    public String ignored() {
+        return "Ignored method";
     }
 }
